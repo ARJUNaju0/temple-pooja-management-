@@ -1,0 +1,65 @@
+
+{% extends 'main/base.html' %}
+{% block title %} Family Tree {% endblock %}
+
+{% block content %}
+
+    <title>Request New Family Member</title>
+    <style>
+        body { font-family: Arial; padding: 30px; }
+        .form-box {
+            width: 420px; margin: auto; padding: 25px;
+            background: #f8f8f8; border-radius: 8px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.15);
+        }
+        input, select {
+            width: 100%; padding: 10px;
+            margin-bottom: 12px; border-radius: 5px;
+        }
+        button {
+            padding: 12px; width: 100%;
+            background: #3a8f42; color: white;
+            border: none; border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+
+
+<div class="form-box">
+    <h3>Create Member Under: {{ parent.member_name }}</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label>Name</label>
+        <input type="text" name="name" required>
+
+        <label>Nakshatram</label>
+        <input type="text" name="nakshatram">
+
+        <label>Gender</label>
+        <select name="gender">
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+        </select>
+
+        <label>Relation to {{ parent.member_name }}</label>
+        <select name="relation">
+            <option value="son">Son</option>
+            <option value="daughter">Daughter</option>
+            <option value="father">Father</option>
+            <option value="mother">Mother</option>
+            <option value="brother">Brother</option>
+            <option value="sister">Sister</option>
+            <option value="spouse">Spouse</option>
+            <option value="other">Other</option>
+        </select>
+
+        <label>Profile Picture</label>
+        <input type="file" name="profile_pic">
+
+        <button type="submit">Submit Request</button>
+    </form>
+
+{% endblock %}

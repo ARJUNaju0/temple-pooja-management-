@@ -1,0 +1,219 @@
+<!-- D:\Django Internship\tprmsystem\pooja\templates\pooja\admin_add.html -->
+{% extends 'main/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="pt-20 pb-10">
+<div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+
+    <!-- HEADER -->
+    <div class="bg-orange-500 p-6 text-center shadow">
+        <h1 class="text-2xl font-bold text-white tracking-wide">Add New Pooja</h1>
+    </div>
+
+    <!-- FORM BODY -->
+    <div class="p-8">
+
+        <!-- Django Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="
+                    px-4 py-3 rounded mb-5 border-l-4 
+                    {% if message.tags == 'error' %}
+                        bg-red-100 text-red-700 border-red-600
+                    {% else %}
+                        bg-green-100 text-green-700 border-green-600
+                    {% endif %}
+                ">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" id="poojaForm" novalidate>
+            {% csrf_token %}
+
+            <!-- FIRST GRID -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                <!-- Pooja Name -->
+                <div>
+                    <label class="font-semibold block mb-2">Pooja Name *</label>
+                    <input 
+                        type="text"
+                        name="name"
+                        id="pooja_name"
+                        value="{{ name }}"
+                        required
+                        minlength="3"
+                        maxlength="200"
+                        pattern="[a-zA-Z\s\-'.]+"
+                        title="Pooja name can only contain letters, spaces, hyphens, apostrophes, and periods"
+                        placeholder="Eg: Ganapathi Homam"
+                        class="w-full h-12 px-4 border border-gray-300 rounded-lg
+                               focus:ring-2 focus:ring-indigo-500 transition"
+                    >
+                </div>
+
+                <!-- Amount -->
+                <div>
+                    <label class="font-semibold block mb-2">Amount (₹) *</label>
+                    <input 
+                        type="number"
+                        name="amount"
+                        value="{{ amount }}"
+                        min="0" step="0.01"
+                        max="1000000"
+                        required
+                        class="w-full h-12 px-4 border border-gray-300 rounded-lg
+                               focus:ring-2 focus:ring-indigo-500 transition"
+                    >
+                </div>
+                
+
+                <!-- Pooja Date -->
+                <div>
+                    <label class="font-semibold block mb-2">Pooja Date</label>
+                    <input 
+                        type="date"
+                        name="pooja_date"
+                        value="{{ pooja_date }}"
+                        min="{{ today }}"
+                        class="w-full h-12 px-4 border border-gray-300 rounded-lg
+                               focus:ring-2 focus:ring-indigo-500 transition"
+                    >
+                </div>
+                <!-- SPECIAL POOJA CHECKBOX -->
+                <div class="flex items-center gap-3 mt-7">
+                    <input 
+                        type="checkbox"
+                        name="is_special"
+                        {% if is_special %}checked{% endif %}
+                        class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                    >
+                    <label class="font-semibold">⭐ Mark as Special Pooja</label>
+                </div>
+
+                <!-- Multiple Bookings Toggle -->
+                <div class="flex items-center gap-3 mt-7">
+                    <input 
+                        type="checkbox"
+                        name="allow_multiple_bookings"
+                        id="multiple-bookings-toggle"
+                        {% if allow_multiple_bookings %}checked{% endif %}
+                        class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                    >
+                    <label for="multiple-bookings-toggle" class="font-semibold">Allow Multiple Bookings</label>
+                </div>
+
+            </div>
+
+            <!-- SLOT MANAGEMENT -->
+            <div class="mt-8 p-4 border border-gray-200 rounded-lg">
+                <div class="flex items-center gap-3 mb-4">
+                    <input 
+                        type="checkbox"
+                        id="enable_slots"
+                        name="enable_slots"
+                        {% if enable_slots or not request.POST %}checked{% endif %}
+                        class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                        onchange="toggleSlotFields()"
+                    >
+                    <label for="enable_slots" class="font-semibold">Enable Slot Booking</label>
+                </div>
+
+                <div id="slotFields" class="{% if not enable_slots and request.POST and 'enable_slots' not in request.POST %}hidden{% endif %} grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 border-t border-gray-100">
+                    <!-- MAX SLOTS -->
+                    <div>
+                        <label class="font-semibold block mb-2">Maximum Slots *</label>
+                        <input 
+                            type="number"
+                            name="max_slots"
+                            id="max_slots"
+                            min="1"
+                            value="{{ max_slots|default:'1' }}"
+                            class="w-full h-12 px-4 border border-gray-300 rounded-lg
+                                   focus:ring-2 focus:ring-indigo-500 transition"
+                            oninput="document.getElementById('available_slots').value = this.value;"
+                            {% if not enable_slots and not request.POST or 'enable_slots' not in request.POST and request.POST %}disabled{% endif %}
+                        >
+                    </div>
+
+                    <!-- AVAILABLE SLOTS -->
+                    <div>
+                        <label class="font-semibold block mb-2">Available Slots *</label>
+                        <input 
+                            type="number"
+                            name="available_slots"
+                            id="available_slots"
+                            value="{{ available_slots|default:max_slots|default:'1' }}"
+                            min="1"
+                            class="w-full h-12 px-4 border border-gray-300 rounded-lg
+                                   focus:ring-2 focus:ring-indigo-500 transition"
+                            {% if not enable_slots and not request.POST or 'enable_slots' not in request.POST and request.POST %}disabled{% endif %}
+                        >
+                    </div>
+                </div>
+            </div>
+
+            
+
+            <!-- DESCRIPTION -->
+            <div class="mt-8">
+                <label class="font-semibold block mb-2">Description</label>
+                <textarea 
+                    name="description"
+                    placeholder="Enter pooja details..."
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg
+                           focus:ring-2 focus:ring-indigo-500 transition min-h-[120px]"
+                >{{ description }}</textarea>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="flex justify-end gap-4 mt-10">
+                <a href="/manage/" 
+                    class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg shadow transition">
+                    Cancel
+                </a>
+
+                <button type="submit" 
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg shadow transition">
+                    Add Pooja
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleSlotFields() {
+        const enableSlots = document.getElementById('enable_slots');
+        const slotFields = document.getElementById('slotFields');
+        const slotInputs = slotFields.getElementsByTagName('input');
+        
+        if (enableSlots.checked) {
+            slotFields.classList.remove('hidden');
+            for (let input of slotInputs) {
+                input.disabled = false;
+            }
+        } else {
+            slotFields.classList.add('hidden');
+            for (let input of slotInputs) {
+                input.disabled = true;
+            }
+        }
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleSlotFields();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Booking Approved{% endblock %}
+
+{% block content %}
+<p style="font-size:16px; color:#333;">
+    Dear <strong>{{ name }}</strong>,
+</p>
+
+<p style="font-size:14px; color:#555;">
+    Your booking has been <strong style="color:green;">approved</strong>.
+</p>
+
+<table width="100%" cellpadding="6" cellspacing="0"
+       style="margin-top:16px; border-collapse:collapse;">
+    <tr>
+        <td><strong>Booking ID</strong></td>
+        <td>{{ booking_id }}</td>
+    </tr>
+    <tr>
+        <td><strong>Status</strong></td>
+        <td>{{ status }}</td>
+    </tr>
+    <tr>
+        <td><strong>Date</strong></td>
+        <td>{{ date }}</td>
+    </tr>
+</table>
+
+<p style="margin-top:20px;">
+    Thank you for choosing our temple services.
+</p>
+{% endblock %}

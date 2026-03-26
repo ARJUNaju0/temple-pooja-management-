@@ -1,0 +1,266 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}My Profile{% endblock %}
+
+
+{% block content %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('profileForm');
+        const saveBtn = document.getElementById('saveProfileBtn');
+        const saveText = saveBtn?.querySelector('.save-text');
+        const loadingSpinner = saveBtn?.querySelector('.loading-spinner');
+        const successAlert = document.getElementById('successAlert');
+        const errorAlert = document.getElementById('errorAlert');
+        const errorMessage = errorAlert?.querySelector('span:last-child');
+
+
+        if (form && saveBtn && saveText && loadingSpinner && successAlert && errorAlert && errorMessage) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                saveBtn.disabled = true;
+                saveText.textContent = 'Saving...';
+                loadingSpinner.classList.remove('hidden');
+                
+                // Hide previous alerts with smooth transition
+                successAlert.classList.add('hidden');
+                errorAlert.classList.add('hidden');
+                
+                try {
+                    // Get form data
+                    const formData = {
+                        first_name: form.querySelector('[name="first_name"]').value,
+                        last_name: form.querySelector('[name="last_name"]').value,
+                        email: form.querySelector('[name="email"]').value,
+                        phone_number: form.querySelector('[name="phone_number"]').value,
+                        gender: form.querySelector('[name="gender"]').value,
+                        nakshatra: form.querySelector('[name="nakshatra"]')?.value || '',
+                    };
+                    
+                    // Get CSRF token
+                    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                    
+                    // Send request to update profile
+                    const response = await fetch('/api/member/profile/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // Show success message
+                        successAlert.classList.remove('hidden');
+                        // Scroll to show the success message
+                        successAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Hide success message after 5 seconds
+                        setTimeout(() => {
+                            successAlert.classList.add('opacity-0');
+                            setTimeout(() => {
+                                successAlert.classList.add('hidden');
+                                successAlert.classList.remove('opacity-0');
+                            }, 300);
+                        }, 5000);
+                    } else {
+                        throw new Error(data.error || 'Failed to update profile');
+                    }
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    errorMessage.textContent = error.message || 'An error occurred while updating your profile';
+                    errorAlert.classList.remove('hidden');
+                    errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } finally {
+                    // Reset button state
+                    saveBtn.disabled = false;
+                    saveText.textContent = 'Save Changes';
+                    loadingSpinner.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>
+
+<style>
+    .alert {
+        transition: all 0.3s ease;
+    }
+</style>
+<section class="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 pt-20 pb-16">
+
+    <div class="max-w-4xl mx-auto px-6">
+
+        <!-- PROFILE CARD -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-amber-300">
+            <div class="flex items-center gap-6">
+
+                <!-- Avatar -->
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-yellow-600 
+                            flex items-center justify-center text-white text-4xl font-bold shadow-md">
+                    {{ user.first_name|default:user.username|first|upper }}
+                </div>
+
+                <!-- Profile Info -->
+                <div>
+                    <h1 class="text-3xl font-bold text-amber-900">
+                        {{ user.first_name }} {{ user.last_name }}
+                    </h1>
+                    <p class="text-amber-600 text-lg">{{ user.email }}</p>
+                    <p class="text-amber-600 text-sm mt-1">
+                        Member since: {{ user.date_joined|date:"F j, Y" }}
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- PROFILE DETAILS -->
+        <form id="profileForm" class="bg-white rounded-2xl shadow-xl p-8 border border-amber-300">
+
+            <h2 class="text-2xl font-bold text-amber-900 mb-6">Profile Information</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Username (readonly) -->
+                <div>
+                    <label class="block text-sm font-semibold text-amber-900 mb-1">Member ID</label>
+                    <input type="text" value="{{ user.id }}" readonly 
+                        class="w-full p-3 border border-amber-300  rounded-xl cursor-not-allowed">
+                    
+                    <label class="mt-2 block text-sm font-semibold text-amber-900 mb-1">Username</label>
+                    <input type="text" value="{{ user.username }}" readonly 
+                        class="w-full p-3 border border-amber-300  rounded-xl cursor-not-allowed">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-semibold text-amber-900 mb-1">Email</label>
+                    <input type="email" name="email" placeholder="Enter Your Email" value="{{ user.email }}" required
+                        class="w-full p-3 border border-amber-300  rounded-xl ">
+
+                        <label class="mt-2 block text-sm font-semibold text-amber-900 mb-1">Nakshatra (Star)</label>
+                    <select name="nakshatra" class="w-full p-3 border border-amber-300  rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                        <option value="">Select Nakshatra</option>
+
+                        <option value="Aswathy" {% if user.nakshatra == "Aswathy" %}selected{% endif %}>Aswathy</option>
+                        <option value="Bharani" {% if user.nakshatra == "Bharani" %}selected{% endif %}>Bharani</option>
+                        <option value="Karthika" {% if user.nakshatra == "Karthika" %}selected{% endif %}>Karthika</option>
+                        <option value="Rohini" {% if user.nakshatra == "Rohini" %}selected{% endif %}>Rohini</option>
+                        <option value="Makayiram" {% if user.nakshatra == "Makayiram" %}selected{% endif %}>Makayiram</option>
+                        <option value="Thiruvathira" {% if user.nakshatra == "Thiruvathira" %}selected{% endif %}>Thiruvathira</option>
+                        <option value="Punartham" {% if user.nakshatra == "Punartham" %}selected{% endif %}>Punartham</option>
+                        <option value="Pooyam" {% if user.nakshatra == "Pooyam" %}selected{% endif %}>Pooyam</option>
+                        <option value="Ayilyam" {% if user.nakshatra == "Ayilyam" %}selected{% endif %}>Ayilyam</option>
+
+                        <option value="Makam" {% if user.nakshatra == "Makam" %}selected{% endif %}>Makam</option>
+                        <option value="Pooram" {% if user.nakshatra == "Pooram" %}selected{% endif %}>Pooram</option>
+                        <option value="Uthram" {% if user.nakshatra == "Uthram" %}selected{% endif %}>Uthram</option>
+                        <option value="Atham" {% if user.nakshatra == "Atham" %}selected{% endif %}>Atham</option>
+                        <option value="Chithira" {% if user.nakshatra == "Chithira" %}selected{% endif %}>Chithira</option>
+                        <option value="Chothi" {% if user.nakshatra == "Chothi" %}selected{% endif %}>Chothi</option>
+                        <option value="Vishakham" {% if user.nakshatra == "Vishakham" %}selected{% endif %}>Vishakham</option>
+                        <option value="Anizham" {% if user.nakshatra == "Anizham" %}selected{% endif %}>Anizham</option>
+                        <option value="Thrikketta" {% if user.nakshatra == "Thrikketta" %}selected{% endif %}>Thrikketta</option>
+
+                        <option value="Moolam" {% if user.nakshatra == "Moolam" %}selected{% endif %}>Moolam</option>
+                        <option value="Pooradam" {% if user.nakshatra == "Pooradam" %}selected{% endif %}>Pooradam</option>
+                        <option value="Uthradam" {% if user.nakshatra == "Uthradam" %}selected{% endif %}>Uthradam</option>
+                        <option value="Thiruvonam" {% if user.nakshatra == "Thiruvonam" %}selected{% endif %}>Thiruvonam</option>
+                        <option value="Avittam" {% if user.nakshatra == "Avittam" %}selected{% endif %}>Avittam</option>
+                        <option value="Chathayam" {% if user.nakshatra == "Chathayam" %}selected{% endif %}>Chathayam</option>
+                        <option value="Poororuttathi" {% if user.nakshatra == "Poororuttathi" %}selected{% endif %}>Poororuttathi</option>
+                        <option value="Uthrattathi" {% if user.nakshatra == "Uthrattathi" %}selected{% endif %}>Uthrattathi</option>
+                        <option value="Revathi" {% if user.nakshatra == "Revathi" %}selected{% endif %}>Revathi</option>
+                    </select>
+                </div>
+
+                <!-- First Name -->
+                <div>
+                    <label class="block text-sm font-semibold text-amber-900 mb-1">First Name</label>
+                    <input type="text" name="first_name" placeholder="Enter Your First Name" value="{{ user.first_name }}" required
+                        class="w-full p-3 border border-amber-300 bg-amber-50 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                    <label class="block text-sm font-semibold text-amber-900 mb-1">Last Name</label>
+                    <input type="text" name="last_name" placeholder="Enter Your Last Name" value="{{ user.last_name }}" required
+                        class="w-full p-3 border border-amber-300 bg-amber-50 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label class="block text-sm font-semibold text-amber-900 mb-1">Phone Number</label>
+                    <input type="tel" name="phone_number" placeholder="Enter Your Phone Number" 
+                        value="{{ user.phone_number|default:'' }}"
+                        class="w-full p-3 border border-amber-300 bg-amber-50 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+
+               <!-- Gender -->
+            <div>
+                <label class="block text-sm font-semibold text-amber-900 mb-1">Gender</label>
+                <select 
+                    class="w-full p-3 border border-amber-300 bg-amber-50 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    name="gender"
+                >
+                    <option value="" disabled {% if not user.gender %}selected{% endif %}>
+                        Select your Gender
+                    </option>
+                    <option value="Male" {% if user.gender == "Male" %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if user.gender == "Female" %}selected{% endif %}>Female</option>
+                    <option value="Other" {% if user.gender == "Other" %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+
+            <div class="mt-8 space-y-4 w-full">
+                <!-- Success and Error Alerts -->
+                <div id="successAlert" class="hidden w-full bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-sm" role="alert">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <strong class="font-semibold">Success! </strong>
+                        <span class="ml-1">Your profile has been updated successfully.</span>
+                    </div>
+                </div>
+                
+                <div id="errorAlert" class="hidden w-full bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm" role="alert">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                        </svg>
+                        <strong class="font-semibold">Error! </strong>
+                        <span class="ml-1">There was an error updating your profile. Please try again.</span>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    {% csrf_token %}
+                    <button type="submit" id="saveProfileBtn" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 px-8 rounded-xl shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
+                        <span class="flex items-center justify-center">
+                            <span class="save-text">Save Changes</span>
+                            <span class="loading-spinner hidden ml-2">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends "main/base.html" %}
+{% block title %}Pending Gallery Approvals{% endblock %}
+
+{% block content %}
+<div class="mt-16 max-w-7xl mx-auto px-4 pb-16">
+
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">
+        Pending Gallery Images
+    </h1>
+
+    {% if images %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+
+        {% for img in images %}
+        <div class="bg-white rounded-xl shadow overflow-hidden"
+             id="image-{{ img.id }}">
+
+            <img src="{{ img.image_url }}"
+                 class="w-full h-48 object-cover">
+
+            <div class="p-4 space-y-2">
+                <p class="font-medium text-gray-800">
+                    {{ img.title|default:"(No title)" }}
+                </p>
+
+                <p class="text-sm text-gray-500">
+                    Uploaded by:
+                    <span class="font-medium">
+                        {{ img.uploaded_by.username }}
+                    </span>
+                </p>
+
+                <p class="text-xs text-gray-400">
+                    {{ img.uploaded_at|date:"d M Y, H:i" }}
+                </p>
+
+                <div class="flex gap-2 pt-3">
+                    <button
+                        onclick="approveImage({{ img.id }})"
+                        class="flex-1 bg-green-600 hover:bg-green-700
+                               text-white py-2 rounded-lg font-medium">
+                        Approve
+                    </button>
+
+                    <button
+                        onclick="rejectImage({{ img.id }})"
+                        class="flex-1 bg-red-600 hover:bg-red-700
+                               text-white py-2 rounded-lg font-medium">
+                        Reject
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="text-center text-gray-500 py-16">
+        No pending images 🎉
+    </div>
+    {% endif %}
+</div>
+
+<script>
+async function approveImage(id) {
+    if (!confirm("Approve this image?")) return;
+
+    const res = await fetch(`/api/gallery/approve/${id}/`, {
+        method: "POST",
+        credentials: "include"
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+        removeCard(id);
+    } else {
+        alert(data.error || "Approval failed");
+    }
+}
+
+async function rejectImage(id) {
+    if (!confirm("Reject & delete this image?")) return;
+
+    const res = await fetch(`/api/gallery/reject/${id}/`, {
+        method: "POST",
+        credentials: "include"
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+        removeCard(id);
+    } else {
+        alert(data.error || "Rejection failed");
+    }
+}
+
+function removeCard(id) {
+    const el = document.getElementById(`image-${id}`);
+    if (el) {
+        el.style.opacity = "0";
+        el.style.transform = "scale(0.9)";
+        setTimeout(() => el.remove(), 300);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block title %}Payment Mode Report{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 pt-20 pb-10">
+
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold">Cash vs UPI Report</h1>
+      <p class="text-gray-500">Payment mode performance</p>
+    </div>
+    <button id="downloadCsvBtn"
+            class="bg-green-600 text-white px-4 py-2 rounded">
+      Download CSV
+    </button>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="bg-white shadow rounded-lg p-4 grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <input type="date" id="fromDate" class="border px-3 py-2 rounded">
+    <input type="date" id="toDate" class="border px-3 py-2 rounded">
+
+    <select id="chartType" class="border px-3 py-2 rounded">
+      <option value="pie">Pie Chart</option>
+      <option value="bar">Bar Chart</option>
+    </select>
+  </div>
+
+  <!-- SUMMARY -->
+  <div id="summaryCards" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 hidden">
+    <div class="bg-green-100 p-4 rounded">Cash: ₹<span id="cashTotal">0</span></div>
+    <div class="bg-blue-100 p-4 rounded">UPI: ₹<span id="upiTotal">0</span></div>
+    <div class="bg-yellow-100 p-4 rounded">Total: ₹<span id="grandTotal">0</span></div>
+  </div>
+
+ <!-- CHART -->
+<div class="bg-white shadow rounded-lg p-6 mb-6">
+  <div class="relative h-64 md:h-72">
+    <canvas id="paymentChart"></canvas>
+  </div>
+</div>
+
+
+  <!-- TABLE -->
+  <div class="bg-white shadow rounded-lg overflow-x-auto">
+    <table class="min-w-full border">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border px-4 py-2">Mode</th>
+          <th class="border px-4 py-2">Bookings</th>
+          <th class="border px-4 py-2">Amount</th>
+          <th class="border px-4 py-2">%</th>
+        </tr>
+      </thead>
+      <tbody id="reportTable"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/admin_payment_report.js' %}"></script>
+{% endblock %}

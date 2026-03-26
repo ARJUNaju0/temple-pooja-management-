@@ -1,0 +1,61 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block title %}Members{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 pt-20 pb-10">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Members</h1>
+        <p class="text-gray-500">All registered members</p>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="mb-4">
+        <input
+            id="searchInput"
+            type="text"
+            placeholder="Search by name / phone / email"
+            class="w-full md:w-1/3 border rounded px-3 py-2"
+        >
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white shadow rounded-lg overflow-x-auto">
+        <table class="min-w-full border">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="border px-3 py-2">ID</th>
+                    <th class="border px-3 py-2">Name</th>
+                    <th class="border px-3 py-2">Username</th>
+                    <th class="border px-3 py-2">Email</th>
+                    <th class="border px-3 py-2">Phone</th>
+                    <th class="border px-3 py-2">Joined</th>
+                    <th class="border px-3 py-2">Status</th>
+                </tr>
+            </thead>
+            <tbody id="memberTable">
+                <tr>
+                    <td colspan="7" class="text-center py-6 text-gray-500">
+                        Loading members...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="flex justify-between items-center mt-4">
+        <span id="pageInfo" class="text-sm text-gray-600"></span>
+        <div class="space-x-2">
+            <button id="prevBtn" class="px-3 py-1 border rounded">Prev</button>
+            <button id="nextBtn" class="px-3 py-1 border rounded">Next</button>
+        </div>
+    </div>
+
+</div>
+
+<script src="{% static 'js/admin_members.js' %}"></script>
+{% endblock %}

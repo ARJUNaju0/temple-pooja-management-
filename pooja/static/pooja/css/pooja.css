@@ -1,0 +1,205 @@
+.pooja-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.card-parent {
+    width: 320px;
+    height: 380px;
+    perspective: 1000px;
+    justify-self: center;
+}
+
+.pooja-card {
+    position: relative;
+    padding-top: 50px;
+    border: 3px solid rgb(255, 215, 163);
+    transform-style: preserve-3d;
+    background: linear-gradient(135deg, #0000 18.75%, #fef3e2 0 31.25%, #0000 0),
+        repeating-linear-gradient(45deg, #fef3e2 -6.25% 6.25%, #fffbf5 0 18.75%);
+    background-size: 60px 60px;
+    background-position: 0 0, 0 0;
+    background-color: #fffaf0;
+    width: 100%;
+    height: 100%;
+    box-shadow: rgba(251, 146, 60, 0.2) 0px 30px 30px -10px;
+    transition: all 0.5s ease-in-out;
+}
+
+.pooja-card * {
+    transform-style: preserve-3d;
+}
+
+.pooja-card:hover {
+    background-position: -100px 100px, -100px 100px;
+    transform: rotate3d(0.5, 1, 0, 30deg);
+}
+
+.pooja-content-box {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    transition: all 0.5s ease-in-out;
+    padding: 60px 25px 25px 25px;
+    transform-style: preserve-3d;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-size: auto;
+    background-position: initial;
+    
+}
+
+.pooja-content-box .pooja-title {
+    display: inline-block;
+    color: white;
+    font-size: 22px;
+    font-weight: 900;
+    transition: all 0.5s ease-in-out;
+    transform: translate3d(0px, 0px, 50px);
+    margin-bottom: 0.5rem;
+}
+
+.pooja-content-box .pooja-title:hover {
+    transform: translate3d(0px, 0px, 60px);
+}
+
+.special-badge {
+    display: inline-block;
+    background: #b14040;
+    color: #000000;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 4px;
+    /* margin-left: 8px; */
+    transform: translate3d(0px, 0px, 55px);
+    transition: all 0.5s ease-in-out;
+}
+
+.special-badge:hover {
+    transform: translate3d(0px, 0px, 65px);
+}
+
+.pooja-content-box .pooja-description {
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff7ed;
+    transition: all 0.5s ease-in-out;
+    transform: translate3d(0px, 0px, 30px);
+    flex-grow: 1;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
+
+.pooja-content-box .pooja-description:hover {
+    transform: translate3d(0px, 0px, 60px);
+}
+
+.pooja-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pooja-amount {
+    font-size: 20px;
+    font-weight: 900;
+    color: #fef3c7;
+    transition: all 0.5s ease-in-out;
+    transform: translate3d(0px, 0px, 40px);
+}
+
+.pooja-amount:hover {
+    transform: translate3d(0px, 0px, 60px);
+}
+
+.book-now-btn {
+    cursor: pointer;
+    display: inline-block;
+    font-weight: 900;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #ea580c;
+    background: white;
+    padding: 0.6rem 1rem;
+    border: none;
+    transition: all 0.5s ease-in-out;
+    transform: translate3d(0px, 0px, 20px);
+    white-space: nowrap;
+}
+
+.book-now-btn:hover {
+    transform: translate3d(0px, 0px, 60px);
+    background: #fffbf5;
+}
+
+.date-badge {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    height: 70px;
+    width: 70px;
+    background: white;
+    border: 2px solid #fb923c;
+    padding: 10px;
+    transform: translate3d(0px, 0px, 80px);
+    box-shadow: rgba(251, 146, 60, 0.3) 0px 17px 10px -10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.date-badge .month {
+    color: #fb923c;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.date-badge .date {
+    font-size: 24px;
+    font-weight: 900;
+    color: #ea580c;
+    line-height: 1;
+}
+
+.date-badge .year {
+    font-size: 9px;
+    font-weight: 600;
+    color: #fb923c;
+}
+
+.section-header {
+    text-align: center;
+    padding: 3rem 2rem 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.no-poojas {
+    text-align: center;
+    padding: 4rem 2rem;
+    font-size: 1.2rem;
+    color: #9a3412;
+}
+
+/* pooja search  */

@@ -1,0 +1,235 @@
+<!-- C:\Users\USER\Desktop\temple-puja-management-testing\booking\templates\booking\admin_pending_bookings.html -->
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Pending Bookings - Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 pt-20 pb-12">
+    
+    <!-- HEADER -->
+    <div class="max-w-7xl mx-auto px-4 mb-8">
+        <div class="bg-white rounded-2xl shadow-lg p-8 border-l-4 border-indigo-600">
+            <h1 class="text-4xl font-bold text-indigo-600 mb-2">Pending Bookings</h1>
+            <p class="text-gray-600">Review and approve/cancel pending member bookings</p>
+        </div>
+    </div>
+    
+    <!-- STATISTICS -->
+    <div class="max-w-7xl mx-auto px-4 mb-8">
+        <div class="grid grid-cols-3 gap-4">
+            <div class="bg-white rounded-lg shadow p-6 border-t-4 border-yellow-500">
+                <div class="text-3xl font-bold text-yellow-600">{{ total_pending }}</div>
+                <div class="text-gray-600 text-sm">Pending</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-t-4 border-green-500">
+                <div class="text-3xl font-bold text-green-600">{{ total_approved }}</div>
+                <div class="text-gray-600 text-sm">Approved</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-t-4 border-red-500">
+                <div class="text-3xl font-bold text-red-600">{{ total_cancelled }}</div>
+                <div class="text-gray-600 text-sm">Cancelled</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FILTERS -->
+    <div class="max-w-7xl mx-auto px-4 mb-8">
+        <form method="GET" class="bg-white rounded-lg shadow p-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                    <select name="status" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        <option value="">All</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Method</label>
+                    <select name="payment_method" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        <option value="">All</option>
+                        <option value="upi" {% if payment_method_filter == 'upi' %}selected{% endif %}>UPI Online</option>
+                        <option value="upi_qr" {% if payment_method_filter == 'upi_qr' %}selected{% endif %}>UPI QR</option>
+                        <option value="cash" {% if payment_method_filter == 'cash' %}selected{% endif %}>Cash</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">From Date</label>
+                    <input type="date" name="date_from" value="{{ date_from }}" 
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">To Date</label>
+                    <input type="date" name="date_to" value="{{ date_to }}" 
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
+                    🔍 Filter
+                </button>
+                <a href="{% url 'admin_pending_bookings' %}" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400">
+                    ↺ Reset
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- BOOKINGS TABLE -->
+    <div class="max-w-7xl mx-auto px-4">
+        {% if bookings %}
+            <div class="bg-white rounded-lg shadow overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-indigo-600 text-white sticky top-0">
+                        <tr>
+                            <th class="px-4 py-3 text-left">ID</th>
+                            <th class="px-4 py-3 text-left">Member</th>
+                            <th class="px-4 py-3 text-left">Pooja</th>
+                            <th class="px-4 py-3 text-left">Amount</th>
+                            <th class="px-4 py-3 text-left">Method</th>
+                            <th class="px-4 py-3 text-left">Status</th>
+                            <th class="px-4 py-3 text-left">Booked</th>
+                            <th class="px-4 py-3 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        {% for booking in bookings %}
+                        <tr class="hover:bg-gray-50" id="booking-{{ booking.id }}">
+                            <td class="px-4 py-3 font-mono text-xs">#{{ booking.id }}</td>
+                            <td class="px-4 py-3">
+                                <div class="font-semibold">{{ booking.user.first_name|default:booking.user.username }}</div>
+                                <div class="text-xs text-gray-500">{{ booking.user.email }}</div>
+                            </td>
+                            <td class="px-4 py-3 font-semibold">{{ booking.pooja.name }}</td>
+                            <td class="px-4 py-3 font-semibold text-orange-600">₹{{ booking.amount }}</td>
+                            <td class="px-4 py-3 text-xs">
+                                {% if booking.payment_method == 'upi' %}
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">💳 UPI Online</span>
+                                {% elif booking.payment_method == 'upi_qr' %}
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded">📱 UPI QR</span>
+                                {% elif booking.payment_method == 'cash' %}
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded">💵 Cash</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3">
+                                {% if booking.status == 'pending' %}
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-semibold">⏳ Pending</span>
+                                {% elif booking.status == 'approved' %}
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-semibold">✓ Approved</span>
+                                {% elif booking.status == 'cancelled' %}
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-semibold">✗ Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3 text-xs text-gray-600">{{ booking.booked_at|date:"d M Y" }}</td>
+                            <td class="px-4 py-3 space-x-2">
+                                {% if booking.status == 'pending' %}
+                                    <button onclick="approveBooking({{ booking.id }})" 
+                                            class="px-3 py-1 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700">
+                                        ✓ Approve
+                                    </button>
+                                    <button onclick="cancelBooking({{booking.id}})" 
+                                            class="px-3 py-1 bg-red-600 text-white rounded text-xs font-semibold hover:bg-red-700">
+                                        ✗ Cancel
+                                    </button>
+                                {% else %}
+                                    <span class="text-gray-400">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- PAGINATION -->
+            {% if page_obj.has_other_pages %}
+            <nav class="mt-8 flex justify-center gap-2">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="px-4 py-2 bg-white border rounded hover:bg-gray-50">First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-white border rounded hover:bg-gray-50">← Prev</a>
+                {% endif %}
+                
+                <span class="px-4 py-2 font-semibold">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-white border rounded hover:bg-gray-50">Next →</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="px-4 py-2 bg-white border rounded hover:bg-gray-50">Last</a>
+                {% endif %}
+            </nav>
+            {% endif %}
+        
+        {% else %}
+            <div class="bg-white rounded-lg shadow p-12 text-center">
+                <p class="text-xl font-semibold text-gray-600">No bookings found</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+async function approveBooking(bookingId) {
+    if (!confirm('Approve this booking?')) return;
+    
+    try {
+        const response = await fetch('{% url "api_approve_booking" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            },
+            body: JSON.stringify({
+                booking_id: bookingId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Booking approved!');
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error approving booking');
+    }
+}
+
+async function cancelBooking(bookingId) {
+    const reason = prompt('Reason for cancellation:');
+    if (!reason) return;
+    
+    try {
+        const response = await fetch('{% url "api_cancel_booking" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            },
+            body: JSON.stringify({
+                booking_id: bookingId,
+                reason: reason
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Booking cancelled!');
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error cancelling booking');
+    }
+}
+</script>
+{% endblock %}

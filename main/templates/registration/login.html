@@ -1,0 +1,324 @@
+<!-- D:\Django Internship\tprmsystem\main\templates\registration\login.html -->
+
+{% extends 'main/base.html' %}
+
+{% block title %}Login - Temple Management{% endblock %}
+
+{% block content %}
+
+<div class="flex items-center justify-center p-4 relative overflow-hidden pt-20" style="min-height: calc(100vh - [navbar-height] - [footer-height]);">
+    <!-- Animated bg -->
+    <div class="absolute inset-0 bg-gradient-to-br from-amber-50 via-orange-100 to-amber-100"></div>
+    
+    <div class="absolute top-20 left-20 w-72 h-72 bg-orange-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-20 w-72 h-72 bg-amber-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-40 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+    
+    <div class="absolute inset-0 opacity-5" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(139, 69, 19, .1) 35px, rgba(139, 69, 19, .1) 70px);"></div>
+    
+    <div class="relative z-10 w-full max-w-md">
+        <div class="bg-box backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-amber-200 p-8 space-y-8 transform hover:scale-[1.02] transition-transform duration-300 relative overflow-hidden">
+            <!-- White overlay -->
+            <div class="absolute inset-0 backdrop-blur-sm rounded-3xl"></div>
+            
+            <!-- Content wrapper -->
+            <div class="relative z-10">
+                <div class="text-center space-y-2">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-orange-400 via-amber-500 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/50 text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 12c2.21 0 4 -1.567 4 -3.5s-1.79 -3.5 -4 -3.5c-1.594 0 -2.97 .816 -3.613 2" /><path d="M3.423 14.483a4.944 4.944 0 0 0 -.423 2.017c0 2.485 1.79 4.5 4 4.5s4 -2.015 4 -4.5s-1.79 -4.5 -4 -4.5" /><path d="M14.071 17.01c.327 2.277 1.739 3.99 3.429 3.99c1.933 0 3.5 -2.239 3.5 -5s-1.567 -5 -3.5 -5c-.96 0 -1.868 .606 -2.5 1.5c-.717 1.049 -1.76 1.7 -2.936 1.7c-.92 0 -1.766 -.406 -2.434 -1.087" /><path d="M17 3l2 2" /><path d="M12 3c1.667 3.667 4.667 5.333 9 5" /></svg>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-bold bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-700 bg-clip-text text-transparent">Welcome Back</h2>
+                    <p class="text-amber-800">Enter your credentials to access temple services</p>
+                </div>
+
+                <!-- Error Message Container -->
+                <div id="error-message" class="hidden bg-red-100 border border-red-300 rounded-xl p-4 backdrop-blur-sm">
+                    <p class="text-red-700 text-sm" id="error-text"></p>
+                </div>
+
+                <!-- Success Message Container -->
+                <div id="success-message" class="hidden bg-green-100 border border-green-300 rounded-xl p-4 backdrop-blur-sm">
+                    <p class="text-green-700 text-sm" id="success-text"></p>
+                </div>
+
+                <!-- Form -->
+                <form id="login-form" class="space-y-6 mt-4" novalidate>
+                    {% csrf_token %}
+
+                    <div class="space-y-2">
+                        <label for="username" class="block text-sm font-semibold text-amber-900">
+                            Username / Member ID
+                        </label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                                <svg class="h-5 w-5 text-amber-600 group-focus-within:text-orange-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </div>
+                            <input type="text" id="username" name="username" required
+                                class="w-full pl-12 pr-4 py-3 border-2 border-amber-200 rounded-xl bg-white/80 backdrop-blur-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all outline-none text-amber-900 placeholder-amber-400"
+                                placeholder="Enter your username"
+                                minlength="3"
+                                maxlength="150">
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
+                                <span id="username-check" class="hidden text-green-600">✓</span>
+                            </div>
+                        </div>
+                        <p id="username-error" class="text-red-600 text-sm hidden"></p>
+                        <p class="text-amber-600 text-xs">At least 3 characters</p>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label for="password" class="block text-sm font-semibold text-amber-900">
+                            Password
+                        </label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                                <svg class="h-5 w-5 text-amber-600 group-focus-within:text-orange-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                            </div>
+                            <input type="password" id="password" name="password" required
+                                class="w-full pl-12 pr-12 py-3 border-2 border-amber-200 rounded-xl bg-white/80 backdrop-blur-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all outline-none text-amber-900 placeholder-amber-400"
+                                placeholder="Enter your password"
+                                minlength="8">
+                            <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 pr-4 flex items-center">
+                                <svg id="eye-icon" class="h-5 w-5 text-amber-600 hover:text-orange-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <p id="password-error" class="text-red-600 text-sm hidden"></p>
+                    </div>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="flex items-center justify-between text-sm">
+                        <label class="flex items-center text-amber-800 hover:text-amber-900 cursor-pointer transition-colors">
+                            <input type="checkbox" id="remember" class="w-4 h-4 rounded border-amber-400 bg-amber-50 text-orange-600 focus:ring-orange-500">
+                            <span class="ml-2">Remember me</span>
+                        </label>
+                        <a href="/forgot-password/" class="text-orange-600 font-bold">
+                            Forgot password?
+                        </a>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="submit-btn" class="w-full relative group overflow-hidden rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-600 p-0.5 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-amber-500/50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="relative block rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-600 px-6 py-3 text-white font-semibold transition-all group-hover:from-orange-400 group-hover:via-amber-400 group-hover:to-yellow-500">
+                            <span id="btn-text">Sign In</span>
+                            <span id="btn-loading" class="hidden">
+                                <svg class="inline animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Signing in...
+                            </span>
+                        </span>
+                    </button>
+                </form>
+
+                <!-- <div class="text-center mt-6">
+                    <p class="text-amber-800 text-sm">
+                        Don't have an account? 
+                        <a href="#" class="text-orange-600 hover:text-orange-700 font-semibold transition-colors">Request One</a>
+                    </p>
+                </div> -->
+            </div>
+            
+            <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent rounded-full"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('login-form');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    const successMessage = document.getElementById('success-message');
+    const successText = document.getElementById('success-text');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnLoading = document.getElementById('btn-loading');
+    const togglePassword = document.getElementById('toggle-password');
+    const usernameCheck = document.getElementById('username-check');
+    const usernameError = document.getElementById('username-error');
+    const passwordError = document.getElementById('password-error');
+
+    // Password toggle
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+    });
+
+    // Real-time username validation
+    usernameInput.addEventListener('input', function() {
+        const username = this.value.trim();
+        
+        if (username.length === 0) {
+            usernameError.textContent = '';
+            usernameError.classList.add('hidden');
+            usernameCheck.classList.add('hidden');
+            this.classList.remove('border-green-500', 'border-red-500');
+        } else if (username.length < 3) {
+            usernameError.textContent = 'Username must be at least 3 characters';
+            usernameError.classList.remove('hidden');
+            usernameCheck.classList.add('hidden');
+            this.classList.remove('border-green-500');
+            this.classList.add('border-red-500');
+        } else {
+            usernameError.classList.add('hidden');
+            usernameCheck.classList.remove('hidden');
+            this.classList.remove('border-red-500');
+            this.classList.add('border-green-500');
+        }
+    });
+
+    // Real-time password validation
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        
+        if (password.length === 0) {
+            passwordError.textContent = '';
+            passwordError.classList.add('hidden');
+            this.classList.remove('border-green-500', 'border-red-500');
+        } else if (password.length < 4) {
+            passwordError.textContent = 'Password must be at least 4 characters';
+            passwordError.classList.remove('hidden');
+            this.classList.remove('border-green-500');
+            this.classList.add('border-red-500');
+        } else {
+            passwordError.classList.add('hidden');
+            this.classList.remove('border-red-500');
+            this.classList.add('border-green-500');
+        }
+    });
+
+    // Form validation before submit
+    function validateForm() {
+        let isValid = true;
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+
+        // Clear previous messages
+        errorMessage.classList.add('hidden');
+
+        // Validate username
+        if (username.length < 3) {
+            usernameError.textContent = 'Username must be at least 3 characters';
+            usernameError.classList.remove('hidden');
+            usernameInput.classList.add('border-red-500');
+            isValid = false;
+        }
+
+        // Validate password
+        if (password.length < 4) {
+            passwordError.textContent = 'Password must be at least 4 characters';
+            passwordError.classList.remove('hidden');
+            passwordInput.classList.add('border-red-500');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    // Form submission  Uses /api/login/ for both admin and members
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Get remember me value
+        const rememberMe = document.getElementById('remember').checked;
+
+        // Validate form
+        if (!validateForm()) {
+            errorText.textContent = 'Please fix the errors above';
+            errorMessage.classList.remove('hidden');
+            return;
+        }
+
+        // Hide previous messages
+        errorMessage.classList.add('hidden');
+        successMessage.classList.add('hidden');
+
+        // Show loading state
+        btnText.classList.add('hidden');
+        btnLoading.classList.remove('hidden');
+        submitBtn.disabled = true;
+
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        try {
+            // Single login endpoint for both admin and members
+            const response = await fetch('/api/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                credentials: 'same-origin',  // Include cookies
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    remember_me: rememberMe
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                // Show success message
+                successText.textContent = 'Login successful! Redirecting...';
+                successMessage.classList.remove('hidden');
+
+                // Store user info in sessionStorage (tokens are in cookies)
+                sessionStorage.setItem('user', JSON.stringify(data.user));
+
+                // Role-based redirect (handled by backend response)
+                setTimeout(() => {
+                    if (data.user.is_staff || data.user.role === 'temple_admin') {
+                        window.location.href = '/temple_admin/dashboard/';
+                    } else {
+                        window.location.href = '/services/';
+                    }
+                }, 1000);
+            } else {
+                // Show error message
+                errorText.textContent = data.error || 'Login failed. Please try again.';
+                errorMessage.classList.remove('hidden');
+                
+                // Reset button
+                btnText.classList.remove('hidden');
+                btnLoading.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            errorText.textContent = 'An error occurred. Please try again.';
+            errorMessage.classList.remove('hidden');
+            
+            // Reset button
+            btnText.classList.remove('hidden');
+            btnLoading.classList.add('hidden');
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Clear errors on input focus
+    usernameInput.addEventListener('focus', function() {
+        errorMessage.classList.add('hidden');
+    });
+
+    passwordInput.addEventListener('focus', function() {
+        errorMessage.classList.add('hidden');
+    });
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,224 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Add Member | Temple Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 font-['Poppins'] p-4 md:p-8 ">
+    
+    <div class="max-w-4xl mx-auto mb-6 pt-16">
+        <nav class="flex text-sm text-gray-500 mb-4">
+            <a href="{% url 'temple_admin:dashboard' %}" class="hover:text-orange-600 transition">Dashboard</a>
+            <span class="mx-2">/</span>
+            <span class="text-gray-800 font-medium">Add Member</span>
+        </nav>
+        <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person-plus-fill text-orange-600" viewBox="0 0 16 16">
+                <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+            </svg>
+            Register New Member
+        </h1>
+        <p class="text-gray-500 text-sm mt-1">Create a member account with username, email and password.</p>
+    </div>
+
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        
+        <form method="POST" id="memberForm" class="p-6 md:p-8">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r">
+                    {% for error in form.non_field_errors %}
+                        <p class="text-red-700 font-medium text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Username Field -->
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username <span class="text-red-500">*</span></label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <p class="text-xs text-red-500 mt-1" id="username-error">{{ form.username.errors.0 }}</p>
+                    {% else %}
+                        <p class="text-xs text-red-500 mt-1 hidden" id="username-error"></p>
+                    {% endif %}
+                    <p class="text-xs text-gray-500 mt-1">At least 3 characters</p>
+                </div>
+
+                <!-- Email Field -->
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address <span class="text-red-500">*</span></label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <p class="text-xs text-red-500 mt-1" id="email-error">{{ form.email.errors.0 }}</p>
+                    {% else %}
+                        <p class="text-xs text-red-500 mt-1 hidden" id="email-error"></p>
+                    {% endif %}
+                </div>
+
+                <!-- Password Field -->
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password <span class="text-red-500">*</span></label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <p class="text-xs text-red-500 mt-1" id="password-error">{{ form.password.errors.0 }}</p>
+                    {% else %}
+                        <p class="text-xs text-red-500 mt-1 hidden" id="password-error"></p>
+                    {% endif %}
+                    <p class="text-xs text-gray-500 mt-1">Min 8 chars, include letters, numbers & special chars</p>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password <span class="text-red-500">*</span></label>
+                    {{ form.confirm_password }}
+                    {% if form.confirm_password.errors %}
+                        <p class="text-xs text-red-500 mt-1" id="confirm-password-error">{{ form.confirm_password.errors.0 }}</p>
+                    {% else %}
+                        <p class="text-xs text-red-500 mt-1 hidden" id="confirm-password-error"></p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="mt-8 flex items-center gap-4 border-t border-gray-100 pt-6">
+                <button type="submit" class="flex-1 bg-orange-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-orange-700 transition shadow-md hover:shadow-lg flex justify-center items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                    </svg>
+                    Create Member
+                </button>
+                <a href="{% url 'temple_admin:dashboard' %}" class="flex-none px-6 py-3 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition border border-transparent hover:border-gray-200">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Live validation
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameInput = document.getElementById('id_username');
+    const emailInput = document.getElementById('id_email');
+    const passwordInput = document.getElementById('id_password');
+    const confirmPasswordInput = document.getElementById('id_confirm_password');
+    
+    const usernameError = document.getElementById('username-error');
+    const emailError = document.getElementById('email-error');
+    const passwordError = document.getElementById('password-error');
+    const confirmPasswordError = document.getElementById('confirm-password-error');
+
+    // Username validation
+    usernameInput.addEventListener('blur', function() {
+        const username = this.value.trim();
+        
+        if (username.length === 0) {
+            showError(usernameError, 'Username is required.');
+            addErrorBorder(usernameInput);
+        } else if (username.length < 3) {
+            showError(usernameError, 'Username must be at least 3 characters long.');
+            addErrorBorder(usernameInput);
+        } else {
+            hideError(usernameError);
+            removeErrorBorder(usernameInput);
+        }
+    });
+
+    // Email validation
+    emailInput.addEventListener('blur', function() {
+        const email = this.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (email.length === 0) {
+            showError(emailError, 'Email is required.');
+            addErrorBorder(emailInput);
+        } else if (!emailRegex.test(email)) {
+            showError(emailError, 'Please enter a valid email address.');
+            addErrorBorder(emailInput);
+        } else {
+            hideError(emailError);
+            removeErrorBorder(emailInput);
+        }
+    });
+
+    // Password validation
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        
+        if (password.length === 0) {
+            hideError(passwordError);
+            removeErrorBorder(passwordInput);
+            return;
+        }
+        
+        if (password.length < 8) {
+            showError(passwordError, 'Password must be at least 8 characters long.');
+            addErrorBorder(passwordInput);
+        } else if (!/[a-zA-Z]/.test(password)) {
+            showError(passwordError, 'Password must contain at least one letter.');
+            addErrorBorder(passwordInput);
+        } else if (!/\d/.test(password)) {
+            showError(passwordError, 'Password must contain at least one number.');
+            addErrorBorder(passwordInput);
+        } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            showError(passwordError, 'Password must contain at least one special character.');
+            addErrorBorder(passwordInput);
+        } else {
+            hideError(passwordError);
+            removeErrorBorder(passwordInput);
+        }
+        
+        // Also validate confirm password if it has value
+        if (confirmPasswordInput.value) {
+            validateConfirmPassword();
+        }
+    });
+
+    // Confirm password validation
+    confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+    
+    function validateConfirmPassword() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        if (confirmPassword.length === 0) {
+            hideError(confirmPasswordError);
+            removeErrorBorder(confirmPasswordInput);
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            showError(confirmPasswordError, 'Passwords do not match.');
+            addErrorBorder(confirmPasswordInput);
+        } else {
+            hideError(confirmPasswordError);
+            removeErrorBorder(confirmPasswordInput);
+        }
+    }
+
+    // Helper functions
+    function showError(element, message) {
+        element.textContent = message;
+        element.classList.remove('hidden');
+    }
+
+    function hideError(element) {
+        element.classList.add('hidden');
+    }
+
+    function addErrorBorder(input) {
+        input.classList.remove('border-gray-200', 'focus:border-orange-500');
+        input.classList.add('border-red-500', 'focus:border-red-500');
+    }
+
+    function removeErrorBorder(input) {
+        input.classList.remove('border-red-500', 'focus:border-red-500');
+        input.classList.add('border-gray-200', 'focus:border-orange-500');
+    }
+});
+</script>
+{% endblock %}

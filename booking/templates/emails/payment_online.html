@@ -1,0 +1,33 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Online Payment Successful{% endblock %}
+
+{% block content %}
+<p style="font-size:16px;">
+    Dear <strong>{{ name }}</strong>,
+</p>
+
+<p>
+    Your <strong>online payment</strong> has been successfully received.
+</p>
+
+<table width="100%" cellpadding="6" cellspacing="0"
+       style="margin-top:16px;">
+    <tr>
+        <td><strong>Booking ID</strong></td>
+        <td>{{ booking_id }}</td>
+    </tr>
+    <tr>
+        <td><strong>Amount</strong></td>
+        <td>₹ {{ amount }}</td>
+    </tr>
+    <tr>
+        <td><strong>Status</strong></td>
+        <td>{{ status }}</td>
+    </tr>
+    <tr>
+        <td><strong>Date</strong></td>
+        <td>{{ date }}</td>
+    </tr>
+</table>
+{% endblock %}

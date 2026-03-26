@@ -1,0 +1,213 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block title %}Admin Booking Report{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 pt-20 pb-10">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Booking Reports</h1>
+        <p class="text-gray-600">Bookings, revenue & payment summary</p>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="bg-white shadow rounded-lg p-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+            <div>
+                <label>Date</label>
+                <input type="date" id="singleDate" class="w-full border rounded px-3 py-2">
+            </div>
+
+            <div>
+                <label>From</label>
+                <input type="date" id="fromDate" class="w-full border rounded px-3 py-2">
+            </div>
+
+            <div>
+                <label>To</label>
+                <input type="date" id="toDate" class="w-full border rounded px-3 py-2">
+            </div>
+
+            <div>
+                <label>Search Devotee</label>
+                <input type="text" id="searchInput" class="w-full border rounded px-3 py-2">
+            </div>
+
+            <div>
+                <label>Payment Status</label>
+                <select id="paymentStatus" class="w-full border rounded px-3 py-2">
+                    <option value="">All</option>
+                    <option value="paid">Paid</option>
+                    <option value="unpaid">Unpaid</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Booking Status</label>
+                <select id="bookingStatus" class="w-full border rounded px-3 py-2">
+                    <option value="">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Payment Method</label>
+                <select id="paymentMethod" class="w-full border rounded px-3 py-2">
+                    <option value="">All</option>
+                    <option value="cash">Cash</option>
+                    <option value="upi">UPI Online</option>
+                    <option value="upi_qr">UPI QR</option>
+                </select>
+            </div>
+
+            <div class="flex items-end gap-2">
+                <button id="printPdfBtn"
+                        class="w-full bg-red-600 text-white py-2 rounded">
+                    PDF
+                </button>
+
+                <button id="csvBtn"
+                        class="w-full bg-green-600 text-white py-2 rounded">
+                    CSV
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-green-100 p-4 rounded">
+            <h3>Total Bookings</h3>
+            <p id="totalBookings" class="text-2xl font-bold">0</p>
+        </div>
+
+        <div class="bg-yellow-100 p-4 rounded">
+            <h3>Total Revenue</h3>
+            <p id="totalRevenue" class="text-2xl font-bold">₹0</p>
+        </div>
+
+        <div class="bg-blue-100 p-4 rounded">
+            <h3>Payment Modes</h3>
+            <p id="paymentModes">—</p>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white shadow rounded-lg overflow-x-auto">
+        <table class="min-w-full border">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="border px-2 py-2">ID</th>
+                    <th class="border px-2 py-2">Pooja</th>
+                    <th class="border px-2 py-2">Devotee</th>
+                    <th class="border px-2 py-2">Date</th>
+                    <th class="border px-2 py-2">Amount</th>
+                    <th class="border px-2 py-2">Payment</th>
+                    <th class="border px-2 py-2">Status</th>
+                </tr>
+            </thead>
+            <tbody id="reportTableBody">
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-gray-500">
+                        Fetch report to view data
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        .print-content, .print-content * {
+            visibility: visible;
+        }
+        .print-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+        .no-print {
+            display: none !important;
+        }
+        @page {
+            size: A4 portrait;
+            margin: 15mm 10mm 15mm 10mm;
+        }
+    }
+</style>
+
+<div class="print-content">
+    <!-- This div will be the only content visible when printing -->
+    <h2 class="text-xl font-bold mb-4">Daily Booking Report</h2>
+    <div id="printSummary" class="mb-4">
+        <!-- Summary will be inserted here by JavaScript -->
+    </div>
+    <div id="printTable">
+        <!-- Table will be inserted here by JavaScript -->
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click handler for PDF button
+        document.getElementById('printPdfBtn').addEventListener('click', function() {
+            // First ensure we have the latest data
+            fetchReport().then(() => {
+                // After data is loaded, prepare and show print dialog
+                preparePrintContent();
+                window.print();
+            });
+        });
+
+        function preparePrintContent() {
+            const printSummary = document.getElementById('printSummary');
+            const printTable = document.getElementById('printTable');
+            const dateValue = document.getElementById('singleDate').value || 
+                             `${document.getElementById('fromDate').value} to ${document.getElementById('toDate').value}`;
+
+            // Update summary section
+            printSummary.innerHTML = `
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="border p-2">
+                        <h3 class="font-semibold">Total Bookings</h3>
+                        <p>${document.getElementById('totalBookings').textContent}</p>
+                    </div>
+                    <div class="border p-2">
+                        <h3 class="font-semibold">Total Revenue</h3>
+                        <p>${document.getElementById('totalRevenue').textContent}</p>
+                    </div>
+                    <div class="border p-2">
+                        <h3 class="font-semibold">Date Range</h3>
+                        <p>${dateValue}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Clone the main table and update the print area
+            const originalTable = document.querySelector('table');
+            if (originalTable) {
+                const tableClone = originalTable.cloneNode(true);
+                printTable.innerHTML = '';
+                printTable.appendChild(tableClone);
+            }
+        }
+
+        // Update print content when print dialog is opened
+        window.onbeforeprint = preparePrintContent;
+    });
+</script>
+
+<script src="{% static 'js/admin_report.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Notification{% endblock %}</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f4f4f4;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;">
+<tr>
+<td align="center">
+
+<table width="600" cellpadding="0" cellspacing="0"
+       style="background-color:#ffffff; margin:20px auto;
+              font-family:Arial, sans-serif; border-radius:6px; overflow:hidden;">
+
+    <!-- HEADER -->
+    <tr>
+        <td style="background-color:#d97706; color:white; padding:16px; text-align:center;">
+            <h2 style="margin:0;">Temple Pooja Management</h2>
+        </td>
+    </tr>
+
+    <!-- CONTENT -->
+    <tr>
+        <td style="padding:24px;">
+            {% block content %}{% endblock %}
+        </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+        <td style="background-color:#fafafa; padding:12px;
+                   text-align:center; font-size:12px; color:#666;">
+            © {{ year }} Temple Pooja Management System
+        </td>
+    </tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>

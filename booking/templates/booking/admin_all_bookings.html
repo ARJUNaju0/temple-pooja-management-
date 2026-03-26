@@ -1,0 +1,366 @@
+<!-- C:\Users\USER\Desktop\temple-puja-management-testing\booking\templates\booking\admin_all_bookings.html -->
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}All Bookings - Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 py-4 mt-16 px-2">
+    <div class="max-w-full mx-auto">
+        <!-- Header -->
+        <div class="mb-4 flex items-center justify-between">
+            <h1 class="text-3xl font-bold text-gray-800">All Bookings</h1>
+            <div class="flex space-x-2">
+                <a href="{% url 'admin_daily_report_page' %}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium">
+                    Booking Report
+                </a>
+                <a href="{% url 'admin_payment_report_page' %}" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm font-medium">
+                    Payment Report
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Cards (Compact) -->
+        <div class="grid grid-cols-4 gap-2 mb-4">
+            <div class="bg-white rounded shadow p-2">
+                <p class="text-gray-600 text-xs">Pending</p>
+                <p class="text-2xl font-bold text-yellow-600">{{ total_pending }}</p>
+            </div>
+            <div class="bg-white rounded shadow p-2">
+                <p class="text-gray-600 text-xs">Approved</p>
+                <p class="text-2xl font-bold text-green-600">{{ total_approved }}</p>
+            </div>
+            <div class="bg-white rounded shadow p-2">
+                <p class="text-gray-600 text-xs">Cancelled</p>
+                <p class="text-2xl font-bold text-red-600">{{ total_cancelled }}</p>
+            </div>
+            <div class="bg-white rounded shadow p-2">
+                <p class="text-gray-600 text-xs">Total</p>
+                <p class="text-2xl font-bold text-blue-600">{{ bookings|length }}</p>
+            </div>
+        </div>
+
+        <!-- Filters Section (Compact) -->
+        <div class="bg-white rounded shadow p-3 mb-4">
+            <form method="GET" class="grid grid-cols-6 gap-2 items-end">
+                <!-- Status Filter -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
+                        <option value="">All</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+
+                <!-- Payment Method Filter -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Method</label>
+                    <select name="payment_method" class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
+                        <option value="">All</option>
+                        <option value="upi" {% if payment_method_filter == 'upi' %}selected{% endif %}>UPI</option>
+                        <option value="upi_qr" {% if payment_method_filter == 'upi_qr' %}selected{% endif %}>QR</option>
+                        <option value="cash" {% if payment_method_filter == 'cash' %}selected{% endif %}>Cash</option>
+                    </select>
+                </div>
+
+                <!-- Date From -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">From</label>
+                    <input type="date" name="date_from" value="{{ date_from }}" class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
+                </div>
+
+                <!-- Date To -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">To</label>
+                    <input type="date" name="date_to" value="{{ date_to }}" class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500">
+                </div>
+
+                <!-- Apply Button -->
+                <button type="submit" class="bg-orange-400 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded text-xs transition">
+                    Filter
+                </button>
+
+                <!-- Reset Button -->
+                <a href="{% url 'admin_all_bookings' %}" class="text-center bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-1 px-3 rounded text-xs transition">
+                    Reset
+                </a>
+            </form>
+        </div>
+
+        <!-- Bookings Table (Compact Horizontal) -->
+        <div class="bg-white rounded shadow overflow-hidden">
+            {% if bookings %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs">
+                        <thead class="bg-orange-600 text-white sticky top-0">
+                            <tr>
+                                <th class="px-2 py-2 text-left font-semibold">ID</th>
+                                <th class="px-2 py-2 text-left font-semibold">Member</th>
+                                <th class="px-2 py-2 text-left font-semibold">Pooja</th>
+                                <th class="px-2 py-2 text-left font-semibold">Amount</th>
+                                <th class="px-2 py-2 text-left font-semibold">Status</th>
+                                <th class="px-2 py-2 text-left font-semibold">Payment</th>
+                                <th class="px-2 py-2 text-left font-semibold">Reference</th>
+                                <th class="px-2 py-2 text-left font-semibold">Method</th>
+                                <th class="px-2 py-2 text-left font-semibold">Date</th>
+                                <th class="px-2 py-2 text-center font-semibold">Approve</th>
+                                <th class="px-2 py-2 text-center font-semibold">Cancel</th>
+                                <th class="px-2 py-2 text-center font-semibold">Mark Paid</th>
+                                <th class="px-2 py-2 text-center font-semibold">View</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for booking in bookings %}
+                                <tr class="hover:bg-blue-50 transition">
+                                    <!-- ID -->
+                                    <td class="px-2 py-2 font-semibold text-gray-800">#{{ booking.id }}</td>
+
+                                    <!-- Member (Compact) -->
+                                    <td class="px-2 py-2 text-gray-900">
+                                        <div class="font-medium text-xs">{{ booking.user.first_name|default:booking.user.username }}</div>
+                                        <div class="text-gray-500 text-xs">{{ booking.user.email|truncatewords:2 }}</div>
+                                    </td>
+
+                                    <!-- Pooja -->
+                                    <td class="px-2 py-2 text-gray-700">{{ booking.pooja.name|truncatewords:2 }}</td>
+
+                                    <!-- Amount -->
+                                    <td class="px-2 py-2 font-medium text-gray-800">₹{{ booking.amount|default:booking.pooja.amount }}</td>
+
+                                    <!-- Status (FIXED) -->
+                                    <td class="px-2 py-2">
+                                        {% if booking.status == 'pending' %}
+                                            <span class="inline-block px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800">Pending</span>
+                                        {% elif booking.status == 'approved' %}
+                                            <span class="inline-block px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">Approved</span>
+                                        {% elif booking.status == 'completed' %}
+                                            <span class="inline-block px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-800">Complete</span>
+                                        {% elif booking.status == 'cancelled' %}
+                                            <span class="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-800">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Payment Status -->
+                                    <td class="px-2 py-2">
+                                        {% if booking.payment_status == 'pending_cash' %}
+                                            <span class="px-2 py-1 rounded text-xs font-semibold bg-yellow-200 text-yellow-900">
+                                                ⏳ Pending Cash
+                                            </span>
+                                        {% elif booking.payment_status == 'paid_cash' %}
+                                            <span class="px-2 py-1 rounded text-xs font-semibold bg-green-200 text-green-900">
+                                                💵 Paid Cash
+                                            </span>
+                                        {% elif booking.payment_status == 'paid_online' or booking.payment_method == 'upi_qr' %}
+                                            <span class="px-2 py-1 rounded text-xs font-semibold bg-blue-200 text-blue-900">
+                                                {% if booking.payment_method == 'upi_qr' %}
+                                                    📱 Paid via QR
+                                                {% else %}
+                                                    💳 Paid Online
+                                                {% endif %}
+                                            </span>
+                                        {% elif booking.payment_status == 'failed' %}
+                                            <span class="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-800">Failed</span>
+                                        {% elif booking.payment_status == 'refunded' %}
+                                            <span class="inline-block px-2 py-1 rounded text-xs font-semibold bg-purple-100 text-purple-800">Refunded</span>
+                                        {% else %}
+                                            <span class="inline-block px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-800">N/A</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Reference Number -->
+                                    <td class="px-2 py-2 text-xs">
+                                        {% if booking.payment_id %}
+                                            <span class="font-mono bg-gray-100 px-2 py-1 rounded">{{ booking.payment_id|truncatechars:12 }}</span>
+                                        {% else %}
+                                            <span class="text-gray-400">-</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Payment Method -->
+                                    <td class="px-2 py-2 text-gray-700 text-xs">
+                                        {% if booking.payment_method == 'upi' %}
+                                            UPI
+                                        {% elif booking.payment_method == 'upi_qr' %}
+                                            QR
+                                        {% elif booking.payment_method == 'cash' %}
+                                            Cash
+                                        {% else %}
+                                            {{ booking.payment_method }}
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Date -->
+                                    <td class="px-2 py-2 text-gray-700 whitespace-nowrap text-xs">{{ booking.booked_at|date:"d M" }}</td>
+
+                                    <!-- Approve Button (only for pending) -->
+                                    <td class="px-2 py-2 text-center">
+                                        {% if booking.status == 'pending' %}
+                                            <button class="approve-btn bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold transition"
+                                                data-booking-id="{{ booking.id }}">
+                                                Approve
+                                            </button>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Reject Button (only for pending) -->
+                                    <td class="px-2 py-2 text-center">
+                                        {% if booking.status == 'pending' %}
+                                            <button class="reject-btn bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold transition"
+                                                data-booking-id="{{ booking.id }}">
+                                                Reject
+                                            </button>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Mark Paid Button (only for offline with pending payment) -->
+                                    <td class="px-2 py-2 text-center">
+                                        {% if booking.payment_status == 'pending' or booking.payment_status == 'pending_cash' %}
+                                            <button class="paid-btn bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold transition"
+                                                data-booking-id="{{ booking.id }}">
+                                                Mark Paid
+                                            </button>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- View Details Link -->
+                                    <td class="px-2 py-2 text-center">
+                                        <a href="{% url 'admin_member_bookings' user_id=booking.user.id %}" class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs font-semibold transition inline-block">
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination (Compact) -->
+                {% if page_obj.has_other_pages %}
+                    <div class="bg-gray-50 px-3 py-2 flex items-center justify-between border-t text-xs">
+                        <div class="text-gray-600">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </div>
+                        <div class="flex gap-1">
+                            {% if page_obj.has_previous %}
+                                <a href="?page=1" class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs">First</a>
+                                <a href="?page={{ page_obj.previous_page_number }}" class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs">Prev</a>
+                            {% endif %}
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}" class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs">Next</a>
+                                <a href="?page={{ page_obj.paginator.num_pages }}" class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs">Last</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="bg-white rounded shadow p-8 text-center">
+                    <p class="text-lg font-semibold text-gray-600">No bookings found</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for AJAX Actions -->
+<script>
+const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                  document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+
+// APPROVE Button Handler
+document.querySelectorAll('.approve-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const bookingId = this.getAttribute('data-booking-id');
+        if (!confirm('Approve this booking?')) return;
+
+        try {
+            const response = await fetch('{% url "api_approve_booking" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({ booking_id: bookingId })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Approved!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+            console.error(error);
+        }
+    });
+});
+
+// REJECT Button Handler
+document.querySelectorAll('.reject-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const bookingId = this.getAttribute('data-booking-id');
+        const reason = prompt('Rejection reason:', 'No reason');
+        if (reason === null) return;
+
+        try {
+            const response = await fetch('{% url "api_cancel_booking" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({ 
+                    booking_id: bookingId,
+                    reason: reason
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Rejected!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+            console.error(error);
+        }
+    });
+});
+
+// MARK AS PAID Button Handler
+document.querySelectorAll('.paid-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const bookingId = this.getAttribute('data-booking-id');
+        if (!confirm('Mark as paid?')) return;
+
+        try {
+            const response = await fetch('{% url "api_mark_cash_paid" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({ booking_id: bookingId })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Marked as Paid!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+            console.error(error);
+        }
+    });
+});
+</script>
+
+{% endblock %}

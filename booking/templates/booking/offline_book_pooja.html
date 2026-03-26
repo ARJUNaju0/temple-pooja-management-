@@ -1,0 +1,148 @@
+<!-- D:\Django Internship\tprmsystem\booking\templates\booking\offline_book_pooja.html -->
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %} Book Pooja (Offline) {% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 pt-20 pb-16">
+    <div class="max-w-lg mx-auto bg-white shadow-xl rounded-2xl p-8" style="border:3px solid gold;">
+        
+        <h2 class="text-center mb-4 text-2xl font-bold text-amber-800">
+            Book: {{ pooja.name }} (Offline)
+        </h2>
+        
+        <p class="text-center text-gray-600 mb-4">
+            Choose payment method and submit for admin approval
+        </p>
+        
+        <form id="offlineBookingForm" method="POST" class="space-y-4" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="pooja_id" value="{{ pooja.id }}">
+            
+            <!-- Payment Method Selection -->
+            <div class="space-y-3">
+                <label class="font-semibold text-gray-700">Payment Method *</label>
+                
+                <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <input type="radio" name="payment_method" value="upi_qr" required>
+                    <span class="ml-3">
+                        <strong>UPI QR Code</strong>
+                        <p class="text-sm text-gray-500">Scan QR code to pay</p>
+                    </span>
+                </label>
+                
+                <label class="flex items-center p-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <input type="radio" name="payment_method" value="cash" required>
+                    <span class="ml-3">
+                        <strong>Cash at Counter</strong>
+                        <p class="text-sm text-gray-500">Pay cash on the day</p>
+                    </span>
+                </label>
+            </div>
+            
+            <!-- QR Display (visible when UPI QR selected) -->
+            <div id="qrSection" class="hidden text-center p-4 bg-gray-100 rounded-lg">
+                <p class="text-sm text-gray-600 mb-2">Scan to pay ₹{{ pooja.amount }}</p>
+                <img src="{% static 'images/qrcode.jpg' %}" alt="Payment QR Code" width="250" height="250">
+                <p class="text-xs text-gray-500 mt-2">UPI ID: your_upi@bank</p>
+            </div>
+            
+            <!-- Cash Display (visible when Cash selected) -->
+            <div id="cashSection" class="hidden text-center p-4 bg-yellow-100 rounded-lg">
+                <p class="text-sm font-semibold text-yellow-800">
+                    💵 Please pay ₹{{ pooja.amount }} at the counter
+                </p>
+            </div>
+            
+            <!-- Devotee Details -->
+            <div>
+                <label class="font-semibold text-gray-700">Devotee Name *</label>
+                <input type="text" name="devotee_name" required minlength="2" 
+                       class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-yellow-500"
+                       placeholder="Enter your full name">
+            </div>
+            
+            <div>
+                <label class="font-semibold text-gray-700">Phone Number *</label>
+                <input type="tel" name="phone" required 
+                       class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-yellow-500"
+                       placeholder="Enter phone number">
+            </div>
+            
+            <div>
+                <label class="font-semibold text-gray-700">Nakshatra *</label>
+                <select name="nakshatra" required 
+                        class="w-full mt-1 p-3 border rounded-lg bg-white focus:ring-2 focus:ring-yellow-500">
+                    <option value="">Select Nakshatra</option>
+                    <option value="Aswathy">Aswathy</option>
+                    <option value="Bharani">Bharani</option>
+                    <!-- Add all 27 nakshatras -->
+                </select>
+            </div>
+            
+            <!-- Amount Display -->
+            <div class="bg-yellow-100 p-3 rounded-lg text-center">
+                <p class="text-lg font-bold text-yellow-800">₹{{ pooja.amount }}</p>
+                <p class="text-xs text-gray-600">Available Slots: {{ pooja.available_slots }}</p>
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit" class="w-full py-3 text-white rounded-lg font-bold"
+                    style="background:linear-gradient(to right,#ebb756,#d97706); box-shadow:0 0 10px gold;">
+                Submit for Approval
+            </button>
+        </form>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'pooja:services' %}" class="text-yellow-700 font-semibold">← Back to Services</a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('offlineBookingForm');
+    const paymentMethod = document.querySelector('input[name="payment_method"]');
+    const qrSection = document.getElementById('qrSection');
+    const cashSection = document.getElementById('cashSection');
+    
+    // Show/hide based on selection
+    document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'upi_qr') {
+                qrSection.classList.remove('hidden');
+                cashSection.classList.add('hidden');
+            } else if (this.value === 'cash') {
+                qrSection.classList.add('hidden');
+                cashSection.classList.remove('hidden');
+            }
+        });
+    });
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        const devoteeName = form.querySelector('input[name="devotee_name"]').value;
+        const phone = form.querySelector('input[name="phone"]').value;
+        const nakshatra = form.querySelector('select[name="nakshatra"]').value;
+        
+        if (!devoteeName || devoteeName.length < 2) {
+            e.preventDefault();
+            alert('Please enter a valid name');
+            return;
+        }
+        
+        if (!phone || !/^\d{10}$|^\+91\d{10}$/.test(phone)) {
+            e.preventDefault();
+            alert('Please enter a valid phone number');
+            return;
+        }
+        
+        if (!nakshatra) {
+            e.preventDefault();
+            alert('Please select a nakshatra');
+            return;
+        }
+    });
+});
+</script>
+{% endblock %}

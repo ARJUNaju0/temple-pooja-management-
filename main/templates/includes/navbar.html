@@ -1,0 +1,77 @@
+<!-- D:\Django Internship\tprmsystem\main\templates\includes\navbar.html -->
+<nav id="navbar" class="bg-black/80 fixed top-0 w-full z-50 transition-all duration-500 ease-in-out bg-transparent text-white">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+            <!-- Brand -->
+             
+            <div class="flex-shrink-0">
+                <span id="brandName" class="text-2xl font-bold text-white">Temple</span>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="{% url 'home'%}" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors">Home</a>
+                <a href="{% url 'family_tree:family_tree'%}" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors">Family</a>
+                <a href="{% url 'pooja:services'%}" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors">Services</a>                
+                <a href="{% url 'gallery'%}" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors">Gallery</a>
+                
+                <!-- Show Admin Dashboard only for admins -->
+                <a href="/temple_admin/dashboard/" id="adminDashboardLink" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors hidden">Admin Dashboard</a>
+                
+                <!-- Show these only for MEMBERS (not admins) -->
+                <a href="/member/profile/" id="profileLink" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors hidden">Profile</a>
+                <!-- For Members -->
+                {% if request.user.role == 'member' %}
+                <a href="{% url 'member_booking_history' %}" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors ">My Bookings</a>
+                {% endif %}
+
+                <!-- For Admins -->
+                {% if request.user.is_staff %}
+                <a href="{% url 'admin_all_bookings' %}" class="nav-link px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-colors ">All Bookings</a>
+                {% endif %}
+
+                <!-- Auth Button -->
+                <div id="authButtonContainer">
+                    <!-- Show login button when NOT authenticated -->
+                    <a href="/login/" id="loginButton" class="px-4 py-2 bg-orange-500 rounded-md text-sm font-medium hover:bg-orange-600 transition-colors">Login</a>
+                    
+                    <!-- Show logout button when authenticated -->
+                    <button onclick="handleLogout()" id="logoutButton" class="hidden px-4 py-2 bg-red-500 rounded-md text-sm font-medium hover:bg-red-600 transition-colors">Logout</button>
+                </div>
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-white hover:text-orange-300">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-black/90">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+            <a href="/" class="nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10">Home</a>
+            <a href="#about" class="nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10">About</a>
+            <a href="#services" class="nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10">Services</a>
+            <a href="#contact" class="nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10">Contact</a>
+            
+            <!-- Mobile Admin Dashboard (admins only) -->
+            <a href="/temple_admin/dashboard/" id="mobileAdminDashboardLink" class="hidden nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10">Admin Dashboard</a>
+            
+            <!-- Mobile Dashboard & Profile (members only) -->
+            <a href="/member/dashboard/" id="mobileDashboardLink" class="hidden nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10">Dashboard</a>
+            <a href="/member/profile/" id="mobileProfileLink" class="hidden nav-link block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10">Profile</a>
+            
+            <!-- Mobile auth links -->
+            <div id="mobileAuthLinks" class="pt-4 border-t border-white/20">
+                <a href="/login/" id="mobileLoginButton" class="block px-3 py-2 rounded-md text-base font-medium bg-orange-500 hover:bg-orange-600 text-center">Login</a>
+                <button onclick="handleLogout()" id="mobileLogoutButton" class="hidden w-full text-left px-3 py-2 rounded-md text-base font-medium bg-red-500 hover:bg-red-600">Logout</button>
+            </div>
+        </div>
+    </div>
+    <div class="absolute bottom-0 left-0 w-full h-[2px] bg-white"></div>
+</nav>

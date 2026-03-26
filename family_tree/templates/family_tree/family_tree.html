@@ -1,0 +1,158 @@
+{% extends 'main/base.html' %}
+{% block content %}
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<div class="container mx-auto p-6">
+    
+    <div class="flex justify-between items-center mb-6 mt-16">
+        <h1 class="text-3xl font-bold text-gray-800">Family Tree Registry</h1>
+        {% if is_admin %}
+        <button onclick="openModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow">
+            + Add Member
+        </button>
+        {% endif %}
+        
+    </div>
+    <div class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-gray-700">
+    <strong class="block mb-1 text-gray-800">How to use this Family Tree</strong>
+    <ul class="list-disc ml-5 space-y-1">
+        <li>Drag to navigate across the family tree</li>
+        <li>Click on a member to expand tree</li>
+        <li><span class="inline-flex items-center"><span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>Male members</span></li>
+        <li><span class="inline-flex items-center"><span class="w-3 h-3 rounded-full bg-pink-500 mr-2"></span>Female members</span></li>
+    </ul>
+</div>
+
+
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-auto relative" style="height: 600px;">
+        <div id="tree-container" class="relative" style="min-width: 100%; min-height: 100%;">
+            <div id="tree-svg-container" class="cursor-move bg-slate-50" style="width: 100%; height: 100%;"></div>
+            
+           <!-- Zoom Controls -->
+            <div class="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                <button
+                    class="zoom-in-btn w-10 h-10 flex items-center justify-center bg-white border rounded shadow hover:bg-gray-100 text-xl font-bold"
+                    title="Zoom In">
+                    +
+                </button>
+
+                <button
+                    class="zoom-out-btn w-10 h-10 flex items-center justify-center bg-white border rounded shadow hover:bg-gray-100 text-xl font-bold"
+                    title="Zoom Out">
+                    −
+                </button>
+            </div>
+
+        </div>
+        
+        <div class="absolute bottom-4 left-4 bg-white p-3 rounded shadow text-sm border">
+            <div class="flex items-center mb-1"><span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span> Male</div>
+            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-pink-500 mr-2"></span> Female</div>
+        </div>
+    </div>
+
+    {% if is_admin %}
+    <div class="mt-8 bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b">
+            <h3 class="font-bold text-gray-700">Member Management</h3>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gender</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Parent</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="member-table-body" class="bg-white divide-y divide-gray-200">
+                </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+<div id="memberModal"
+     class="fixed inset-0 z-50 hidden flex items-center justify-center bg-gray-900 bg-opacity-40 backdrop-blur-sm p-4">
+
+    <div class="relative w-full max-w-2xl bg-white rounded-md shadow-md border p-6 max-h-[90vh] overflow-y-auto">
+
+        <h3 class="text-lg font-medium text-gray-900 mb-4" id="modalTitle">
+            Member Details
+        </h3>
+
+        <form id="memberForm" class="mt-4">
+            <input type="hidden" id="memberId">
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Member Type</label>
+                <div class="flex gap-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="addMode" value="root" class="form-radio text-indigo-600" onchange="toggleFormFields()">
+                        <span class="ml-2">Root (First Ancestor)</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="addMode" value="child" class="form-radio text-indigo-600" checked onchange="toggleFormFields()">
+                        <span class="ml-2">Child (Blood Relation)</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="addMode" value="spouse" class="form-radio text-indigo-600" onchange="toggleFormFields()">
+                        <span class="ml-2">Spouse (Married In)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Photo</label>
+                <input type="file" id="photo" class="shadow border rounded w-full py-2 px-3 text-gray-700">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+                <input type="text" id="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Gender</label>
+                <select id="gender" class="shadow border rounded w-full py-2 px-3 text-gray-700">
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                </select>
+            </div>
+
+            <div class="mb-4" id="parentField">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Select Parent (Blood Relation)
+                </label>
+                <select id="parentSelect" class="shadow border rounded w-full py-2 px-3 text-gray-700">
+                    <option value="">-- Select Parent --</option>
+                </select>
+                <p class="text-xs text-gray-500 mt-1">Only blood relatives are shown here.</p>
+            </div>
+
+            <div class="mb-4 hidden" id="spouseField">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Select Partner (To marry)
+                </label>
+                <select id="spouseSelect" class="shadow border rounded w-full py-2 px-3 text-gray-700">
+                    <option value="">-- Select Partner --</option>
+                </select>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/static/js/family_tree.js"></script>
+
+<script>
+    const IS_ADMIN = {{ is_admin|yesno:"true,false"}};
+</script>
+
+{% endblock %}

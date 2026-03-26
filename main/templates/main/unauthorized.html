@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unauthorized Access</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-red-900 to-gray-900 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-2xl w-full">
+        <!-- Animated Lock Icon -->
+        <div class="text-center mb-8 float-animation">
+            <div class="inline-flex items-center justify-center w-32 h-32 bg-red-500/20 rounded-full backdrop-blur-sm border-4 border-red-500/50">
+                <svg class="w-16 h-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Error Message Card -->
+        <div class="bg-gray-800/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-red-500/30 p-8 md:p-12">
+            <div class="text-center space-y-6">
+                <!-- Error Code -->
+                <div>
+                    <h1 class="text-6xl md:text-7xl font-bold text-red-500 mb-2">403</h1>
+                    <h2 class="text-2xl md:text-3xl font-semibold text-white mb-4">Access Denied</h2>
+                </div>
+
+                <!-- Error Description -->
+                <div class="space-y-3">
+                    <p class="text-gray-300 text-lg">
+                        You don't have permission to access this page.
+                    </p>
+                    <p class="text-gray-400 text-sm" id="roleMessage">
+                        <!-- Dynamic message will be inserted here -->
+                    </p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
+                    <button onclick="goBack()" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg">
+                        Go Back
+                    </button>
+                    <button onclick="goToDashboard()" class="px-8 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg">
+                        Go to Dashboard
+                    </button>
+                </div>
+
+                <!-- Additional Help -->
+                <div class="pt-6 border-t border-gray-700">
+                    <p class="text-gray-400 text-sm">
+                        If you believe this is an error, please contact the administrator.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decorative Elements -->
+        <div class="absolute top-10 left-10 w-20 h-20 bg-red-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-10 right-10 w-32 h-32 bg-red-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <script>
+        // Check user role and display appropriate message
+        async function checkUserRole() {
+            try {
+                const response = await fetch('/api/user/', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    const roleMessageEl = document.getElementById('roleMessage');
+                    
+                    if (userData.is_staff || userData.role === 'temple_admin') {
+                        roleMessageEl.innerHTML = '🔐 <strong>Admin users</strong> cannot access member pages. Please use the Admin Dashboard.';
+                    } else if (userData.role === 'member') {
+                        roleMessageEl.innerHTML = '👤 <strong>Members</strong> cannot access admin pages. Please use the Member Dashboard.';
+                    } else {
+                        roleMessageEl.innerHTML = 'This page is restricted to authorized users only.';
+                    }
+                }
+            } catch (error) {
+                document.getElementById('roleMessage').innerHTML = 'This page is restricted to authorized users only.';
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        async function goToDashboard() {
+            try {
+                const response = await fetch('/api/user/', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    
+                    // Redirect based on role
+                    if (userData.is_staff || userData.role === 'temple_admin') {
+                        window.location.href = '/temple_admin/dashboard/';
+                    } else if (userData.role === 'member') {
+                        window.location.href = '/member/dashboard/';
+                    } else {
+                        window.location.href = '/';
+                    }
+                } else {
+                    window.location.href = '/login/';
+                }
+            } catch (error) {
+                window.location.href = '/';
+            }
+        }
+
+        // Run on page load
+        checkUserRole();
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!-- E:\study\aspen\booking\templates\booking\admin_member_bookings.html -->
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}{{ member.first_name }} Bookings - Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-red-50  pt-20 pb-12">
+    
+    <!-- HEADER -->
+    <div class="max-w-6xl mx-auto px-4  mb-8">
+        <a href="{% url 'admin_all_bookings' %}" class="text-indigo-600 hover:text-indigo-800 font-semibold mb-4 inline-block">← Back to All Bookings</a>
+        
+        <div class="bg-white rounded-2xl shadow-lg p-8 border-l-4 border-purple-600">
+            <h1 class="text-3xl font-bold text-purple-600 mb-2">
+                {{ member.first_name|default:member.username }}'s Bookings
+            </h1>
+            <p class="text-gray-600">{{ member.email }}</p>
+        </div>
+    </div>
+    
+    <!-- STATISTICS -->
+    <div class="max-w-6xl mx-auto px-4 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white rounded-lg shadow p-6 border-t-4 border-blue-500">
+                <div class="text-3xl font-bold text-blue-600">{{ total_bookings }}</div>
+                <div class="text-gray-600 text-sm">Total</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-t-4 border-green-500">
+                <div class="text-3xl font-bold text-green-600">{{ pending_bookings }}</div>
+                <div class="text-gray-600 text-sm">Pending</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-t-4 border-purple-500">
+                <div class="text-3xl font-bold text-purple-600">{{ completed_bookings }}</div>
+                <div class="text-gray-600 text-sm">Completed</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-t-4 border-red-500">
+                <div class="text-3xl font-bold text-red-600">{{ cancelled_bookings }}</div>
+                <div class="text-gray-600 text-sm">Cancelled</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- BOOKINGS TABLE -->
+    <div class="max-w-6xl mx-auto px-4">
+        {% if bookings %}
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-purple-600 text-white">
+                        <tr>
+                            <th class="px-6 py-3 text-left">Pooja</th>
+                            <th class="px-6 py-3 text-left">Amount</th>
+                            <th class="px-6 py-3 text-left">Status</th>
+                            <th class="px-6 py-3 text-left">Date</th>
+                            <th class="px-6 py-3 text-left">Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        {% for booking in bookings %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-semibold">{{ booking.pooja.name }}</td>
+                            <td class="px-6 py-4 font-semibold text-orange-600">₹{{ booking.amount|default:booking.pooja.amount }}</td>
+                            <td class="px-6 py-4">
+                                {% if booking.status == 'completed' %}
+                                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">completed</span>
+                                {% elif booking.status == 'approved' %}
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">booked</span>
+                                {% elif booking.status == 'cancelled' %}
+                                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">cancelled</span>
+                                {% elif booking.status == 'pending' %}
+                                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">pending</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-gray-600">{{ booking.booked_at|date:"d M, Y H:i" }}</td>
+                            <td class="px-6 py-4">
+                                {% if booking.payment_status == 'paid_online' and booking.payment_status == 'paid_cash' %}
+                                    <span class="text-green-600 font-semibold">Paid</span>
+                                {% elif booking.payment_status == 'pending' and booking.payment_status == 'pending_cash' %}
+                                    <span class="text-yellow-600 font-semibold">Pending</span>
+                                {% elif booking.payment_status == 'failed' %}
+                                    <span class="text-red-600 font-semibold">Failed</span>
+                                {% elif booking.payment_status == 'refunded' %}
+                                    <span class="text-red-600 font-semibold">Refunded</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="bg-white rounded-lg shadow p-12 text-center">
+                <p class="text-xl font-semibold text-gray-600">No bookings for this member</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

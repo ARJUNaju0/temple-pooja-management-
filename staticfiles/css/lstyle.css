@@ -1,0 +1,410 @@
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    width: 100%;
+}
+
+
+/* login page animations */
+    @keyframes blob {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        25% { transform: translate(20px, -50px) scale(1.1); }
+        50% { transform: translate(-20px, 20px) scale(0.9); }
+        75% { transform: translate(50px, 50px) scale(1.05); }
+    }
+    
+    .animate-blob {
+        animation: blob 7s infinite;
+    }
+    
+    .animation-delay-2000 {
+        animation-delay: 2s;
+    }
+    
+    .animation-delay-4000 {
+        animation-delay: 4s;
+    }
+
+    /* Style Django form inputs  */
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        background: rgba(255, 255, 255, 0.7);
+        border: 2px solid rgba(251, 191, 36, 0.3);
+        border-radius: 0.75rem;
+        color: #78350f;
+        font-size: 0.875rem;
+        transition: all 0.3s;
+        backdrop-filter: blur(10px);
+    }
+    
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.9);
+        border-color: #f97316;
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+    }
+    
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder {
+        color: rgba(120, 53, 15, 0.5);
+    }
+
+/* form bg image  */
+.bg-box {
+    background-image: url('/static/images/bgg.jpeg'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat; 
+    width: 100%;
+    height: 100%; 
+}
+
+
+/* navbar end  */
+
+
+/* github checkitout */
+.button-icon {
+  display: flex;
+  border: 3px #fff solid;
+  width: fit-content;
+  height: fit-content;
+  cursor: pointer;
+}
+
+/* .icon {
+  background-color: #fff;
+  padding: 10px 10px 5px 10px;
+} */
+
+/* .icon svg {
+  width: 25px;
+  height: 25px;
+} */
+
+.cube {
+  transition: all 0.4s;
+  transform-style: preserve-3d;
+  width: 200px;
+  height: 20px;
+}
+
+.button-icon:hover {
+  border-color: #ff98a2;
+}
+
+.button-icon:hover .cube {
+  transform: rotateX(90deg);
+}
+
+.side {
+  position: absolute;
+  height: 47px;
+  width: 200px;
+  display: flex;
+  font-size: 0.8em;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: bold;
+}
+
+.top {
+  background: #ff98a2;
+  color: #fff;
+  transform: rotateX(-90deg) translate3d(0, 13.5px, 2em);
+}
+
+.front {
+  background: #222229;
+  color: #fff;
+  transform: translate3d(0, 0, 1em);
+}
+
+.top {
+  background: #ff98a2;
+  color: #fff;
+  transform: rotateX(-90deg) translate3d(0, 13.5px, 2em);
+}
+
+.front {
+  background: #222229;
+  color: #fff;
+  transform: translate3d(0, 0, 1em);
+}
+
+/* icon  */
+/* .card {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background: lightgrey;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  transition: all 1s ease-in-out;
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 100% 107%, #ff89cc 0%, #9cb8ec 30%, #00ffee 60%, #62c2fe 100%);
+}
+
+.logo {
+  position: absolute;
+  right: 50%;
+  bottom: 50%;
+  transform: translate(50%, 50%);
+  transition: all 0.6s ease-in-out;
+}
+
+.logo .logo-svg {
+  fill: white;
+  width: 30px;
+  height: 30px;
+}
+
+.icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+
+.icon .svg {
+  fill: rgba(255, 255, 255, 0.797);
+  width: 100%;
+  transition: all 0.5s ease-in-out;
+}
+
+.box {
+  position: absolute;
+  padding: 10px;
+  text-align: right;
+  background: rgba(255, 255, 255, 0.389);
+  border-top: 2px solid rgb(255, 255, 255);
+  border-right: 1px solid white;
+  border-radius: 10% 13% 42% 0%/10% 12% 75% 0%;
+  box-shadow: rgba(100, 100, 111, 0.364) -7px 7px 29px 0px;
+  transform-origin: bottom left;
+  transition: all 1s ease-in-out;
+}
+
+.box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: all 0.5s ease-in-out;
+}
+
+.box:hover .svg {
+  fill: white;
+}
+
+.box1 {
+  width: 70%;
+  height: 70%;
+  bottom: -70%;
+  left: -70%;
+}
+
+.box1::before {
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #ff53d4 60%, #62c2fe 90%);
+}
+
+.box1:hover::before {
+  opacity: 1;
+}
+
+.box1:hover .icon .svg {
+  filter: drop-shadow(0 0 5px white);
+}
+
+.box2 {
+  width: 50%;
+  height: 50%;
+  bottom: -50%;
+  left: -50%;
+  transition-delay: 0.2s;
+}
+
+.box2::before {
+  background: radial-gradient(circle at 30% 107%, #91e9ff 0%, #00ACEE 90%);
+}
+
+.box2:hover::before {
+  opacity: 1;
+}
+
+.box2:hover .icon .svg {
+  filter: drop-shadow(0 0 5px white);
+}
+
+.box3 {
+  width: 30%;
+  height: 30%;
+  bottom: -30%;
+  left: -30%;
+  transition-delay: 0.4s;
+}
+
+.box3::before {
+  background: radial-gradient(circle at 30% 107%, #969fff 0%, #b349ff 90%);
+}
+
+.box3:hover::before {
+  opacity: 1;
+}
+
+.box3:hover .icon .svg {
+  filter: drop-shadow(0 0 5px white);
+}
+
+.box4 {
+  width: 10%;
+  height: 10%;
+  bottom: -10%;
+  left: -10%;
+  transition-delay: 0.6s;
+}
+
+.card:hover {
+  transform: scale(1.1);
+}
+
+.card:hover .box {
+  bottom: -1px;
+  left: -1px;
+}
+
+.card:hover .logo {
+  transform: translate(0, 0);
+  bottom: 20px;
+  right: 20px;
+} */
+
+/* fancy footer css
+ */
+ /* .button1 {
+  position: relative;
+  width: 180px;
+  height: 50px;
+  border: none;
+  background-color: rgb(231, 0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: hidden;
+  border-radius: 0px;
+  cursor: pointer;
+  box-shadow: 8px 8px 0px rgb(12, 12, 12);
+  transition-duration: .3s;
+}
+
+.layer {
+  width: 60px;
+  position: absolute;
+  left: -30px;
+  transition-duration: .3s;
+  fill: #ffaf02;
+}
+
+button:hover {
+  transform: translateY(5px);
+  box-shadow: 3px 3px 0px rgb(0, 0, 0);
+  transition-duration: .3s;
+}
+
+button:hover .layer {
+  left: 0%;
+  width: 100%;
+  transition-duration: .3s;
+}
+
+button p {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  position: absolute;
+  z-index: 2;
+  transition-duration: .1s;
+  font-family: Whitney, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+button:hover p {
+  color: transparent;
+  transition-duration: .3s;
+} */
+
+
+/* pooja section  */
+.pooja1-section {
+    padding: 100px 20px;
+    background: linear-gradient(to bottom, #111827, #451a03, #111827);
+}
+
+.pooja1-container {
+    max-width: 1100px;
+    margin: auto;
+    text-align: center;
+}
+
+.pooja1-title {
+    font-size: 42px;
+    color: #b45309;
+    margin-bottom: 16px;
+}
+
+.pooja1-subtitle {
+    font-size: 18px;
+    color: #7c2d12;
+    max-width: 600px;
+    margin: 0 auto 50px;
+}
+
+.pooja1-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.pooja1-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.pooja1-card h3 {
+    color: #92400e;
+    margin-bottom: 8px;
+}
+
+.pooja1-btn {
+    display: inline-block;
+    background: #f97316;
+    color: white;
+    padding: 14px 40px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.pooja1-btn:hover {
+    background: #ea580c;
+}
+
+#cinematic-gallery {
+    background: linear-gradient(to bottom, #fff7ed, #ffedd5);
+}

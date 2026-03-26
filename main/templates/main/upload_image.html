@@ -1,0 +1,314 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}upload imagee{% endblock %}
+
+
+{% block content %}
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Toast notification styles -->
+<style>
+    .swal2-toast {
+        font-size: 0.875rem;
+        padding: 0.75rem 1.25rem;
+    }
+</style>
+
+<div class="flex-grow flex items-center justify-center py-8 px-4 mt-16">
+    <div class="w-full max-w-md">
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+
+    <!-- Title -->
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">
+        Upload Image
+    </h2>
+
+    <!-- Image Title -->
+    <input
+        id="title"
+        type="text"
+        placeholder="Enter image title"
+        class="w-full mb-4 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400 outline-none transition"
+    />
+
+    <!-- Drag & Drop -->
+    <div
+        id="dropZone"
+        class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer transition-all duration-300 hover:border-orange-400 hover:bg-orange-50"
+    >
+        <p class="text-gray-600 font-medium">Drag & drop image here</p>
+        <p class="text-sm text-gray-400 mt-1">or tap to select</p>
+        <input id="fileInput" type="file" class="hidden" multiple accept="image/*" />
+    </div>
+
+    <!-- Preview Grid -->
+    <div id="previewContainer" class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <!-- Preview items will be added here -->
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="mt-4 hidden" id="progressWrapper">
+        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div
+                id="progressBar"
+                class="bg-orange-500 h-3 w-0 transition-all duration-200"
+            ></div>
+        </div>
+        <p id="progressText" class="text-xs text-center mt-1 text-gray-600"></p>
+    </div>
+
+    <!-- Buttons Container -->
+    <div class="mt-6 space-y-3">
+        <!-- Upload Button -->
+        <button
+            id="uploadBtn"
+            onclick="uploadImage()"
+            class="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+            Upload
+        </button>
+    </div>
+
+    <!-- Status container (hidden, used by SweetAlert2) -->
+    <div id="status" style="display: none;"></div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedFiles = [];
+const fileInput = document.getElementById('fileInput');
+const dropZone = document.getElementById('dropZone');
+const previewContainer = document.getElementById('previewContainer');
+const progressWrapper = document.getElementById('progressWrapper');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+
+/* Click select */
+dropZone.addEventListener("click", () => fileInput.click());
+
+/* Handle file selection */
+function handleFileSelect(e) {
+    const files = Array.from(e.target.files || (e.dataTransfer ? e.dataTransfer.files : []));
+    
+    // Filter only image files
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    
+    if (imageFiles.length === 0) return;
+    
+    // Add new files to selectedFiles
+    selectedFiles = [...selectedFiles, ...imageFiles];
+    
+    // Clear and rebuild previews
+    updatePreviews();
+    
+    // Reset file input to allow selecting the same file again
+    fileInput.value = '';
+}
+
+fileInput.addEventListener("change", handleFileSelect);
+
+/* Drag effects */
+dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("border-orange-500", "bg-orange-50", "scale-105");
+});
+
+dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("border-orange-500", "bg-orange-50", "scale-105");
+});
+
+dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove("border-orange-500", "bg-orange-50", "scale-105");
+    handleFileSelect(e);
+});
+
+/* Update all previews */
+function updatePreviews() {
+    // Clear existing previews
+    previewContainer.innerHTML = '';
+    
+    // Add preview for each selected file
+    selectedFiles.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'relative group';
+            previewItem.innerHTML = `
+                <img src="${e.target.result}" 
+                     class="w-full h-32 object-cover rounded-lg border shadow-md" />
+                <button type="button" 
+                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onclick="removeImage(${index})"
+                        title="Remove image">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            `;
+            previewContainer.appendChild(previewItem);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+/* Remove image preview */
+function removeImage(index) {
+    selectedFiles.splice(index, 1);
+    updatePreviews();
+}
+
+/* Upload with progress */
+async function uploadImage() {
+    const uploadBtn = document.getElementById("uploadBtn");
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = 'Uploading...';
+    
+    const title = document.getElementById("title").value.trim();
+    const token = localStorage.getItem("access_token");
+
+    if (!title) {
+        showStatus("Title is required", false);
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = 'Upload';
+        return;
+    }
+    if (selectedFiles.length === 0) {
+        showStatus("Please select at least one image", false);
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = 'Upload';
+        return;
+    }
+
+    progressWrapper.classList.remove("hidden");
+    progressBar.style.width = "0%";
+    progressText.innerText = "Preparing to upload...";
+
+    let successfulUploads = 0;
+    const totalFiles = selectedFiles.length;
+
+    try {
+        for (let i = 0; i < selectedFiles.length; i++) {
+            const file = selectedFiles[i];
+            
+            // Update progress
+            progressText.innerText = `Uploading ${i + 1} of ${totalFiles}...`;
+            
+            const formData = new FormData();
+            formData.append("image", file);
+            formData.append("title", `${title} (${i + 1})`);
+
+            const response = await fetch("/api/gallery/upload/", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                let errorMessage = "Upload failed";
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || response.statusText || errorMessage;
+                } catch (e) {
+                    // If we can't parse JSON, use status text or default message
+                    errorMessage = response.statusText || errorMessage;
+                }
+                throw new Error(errorMessage);
+            }
+            const data = await response.json();
+            
+            successfulUploads++;
+            const percentComplete = Math.round((i + 1) / totalFiles * 100);
+            progressBar.style.width = `${percentComplete}%`;
+        }
+
+        // Show success message with auto-close and redirect
+        let successMessage = `Successfully uploaded ${successfulUploads} image(s). `;
+        successMessage += "{{ user.is_staff|yesno:'The images have been added to the gallery.,The images will be visible in the gallery after admin approval.' }}";
+        
+        showStatus(successMessage, true);
+        
+        // Reset form
+        resetForm();
+        
+        // // Redirect after a short delay
+        // setTimeout(() => {
+        //     window.location.href = "{% url 'gallery' %}";
+        // }, 3000);
+
+    } catch (error) {
+        const errorMessage = `Error: ${error.message}. ${successfulUploads} of ${totalFiles} images uploaded successfully.`;
+        showStatus(errorMessage, false);
+        console.error("Upload error:", error);
+    } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = 'Upload';
+    }
+}
+
+/* Show toast notification */
+function showStatus(msg, success) {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top',
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true,
+        width: 'auto',
+        customClass: {
+            container: 'swal2-top-center',
+            popup: 'swal2-toast-top-center'
+        },
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+        }
+    });
+
+    Toast.fire({
+        icon: success ? 'success' : 'error',
+        title: msg,
+        background: success ? '#f0fdf4' : '#fef2f2',
+        color: success ? '#166534' : '#991b1b',
+        iconColor: success ? '#16a34a' : '#dc2626'
+    });
+}
+
+/* Reset form and prepare for new upload */
+function resetForm() {
+    // Reset file input
+    fileInput.value = '';
+    selectedFiles = [];
+    
+    // Reset preview
+    previewContainer.innerHTML = '';
+    
+    // Reset title
+    document.getElementById('title').value = '';
+    
+    // Reset progress
+    progressWrapper.classList.add('hidden');
+    progressBar.style.width = '0%';
+    progressText.innerText = '0%';
+    
+    // Reset upload button
+    const uploadBtn = document.getElementById('uploadBtn');
+    uploadBtn.disabled = false;
+    uploadBtn.innerHTML = 'Upload';
+    
+    // Safely handle clear button if it exists
+    const clearBtn = document.getElementById('clearBtn');
+    if (clearBtn) {
+        clearBtn.classList.add('hidden');
+    }
+    
+    // Status is now handled by SweetAlert
+}
+</script>
+{% endblock %}

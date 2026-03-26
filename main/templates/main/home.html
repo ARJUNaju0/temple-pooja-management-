@@ -1,0 +1,485 @@
+<!-- C:\Users\USER\Desktop\temple-puja-management-testing\main\templates\main\home.html -->
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Home - Temple Management{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Animation base styles */
+  .fade-up,
+  .fade-left,
+  .fade-right,
+  .scale-in {
+    opacity: 0;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .fade-up {
+    transform: translateY(40px);
+  }
+
+  .fade-left {
+    transform: translateX(-40px);
+  }
+
+  .fade-right {
+    transform: translateX(40px);
+  }
+
+  .scale-in {
+    transform: scale(0.9);
+  }
+
+  .animate-in {
+    opacity: 1 !important;
+    transform: translate(0, 0) scale(1) !important;
+  }
+
+  /* Hero section enhancements */
+  .hero-gradient {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(180, 83, 9, 0.6) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+  }
+
+  /* Floating animation */
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glow effect */
+  .glow {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .glow:hover {
+    box-shadow: 0 0 30px rgba(249, 115, 22, 0.6);
+  }
+
+  /* Pooja cards hover effects */
+  .pooja-card-hover {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .pooja-card-hover:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Stack Gallery Styles */
+  .stack-container {
+    perspective: 1000px;
+  }
+
+  .stack-card {
+    transform-origin: center center;
+    transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .stack-card img {
+    transition: transform 0.7s ease;
+  }
+
+  .stack-card:hover img {
+    transform: scale(1.05);
+  }
+
+  /* History Section Styles */
+  .history-card {
+    transform: translateY(50px);
+    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .history-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: currentColor;
+  }
+
+  .timeline-container {
+    transform: translateY(50px);
+    transition: all 1s ease;
+  }
+
+  .timeline-item {
+    position: relative;
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: all 0.8s ease;
+  }
+
+  .timeline-item:nth-child(even) {
+    transform: translateX(50px);
+  }
+
+  /* Animated Letters */
+  .gallery-letter,
+  .history-letter {
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  .gallery-letter:hover,
+  .history-letter:hover {
+    color: #f97316;
+    transform: scale(1.2) rotate(5deg);
+  }
+
+  .history-line {
+    transform: scaleX(0);
+    transition: transform 1s ease;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .stack-card {
+      width: 90% !important;
+      height: 300px !important;
+    }
+
+    .timeline-item {
+      flex-direction: column !important;
+      padding: 0 !important;
+    }
+  }
+
+
+  .view-all-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: white;
+    stroke-width: 2;
+    transition: transform 0.3s ease;
+  }
+
+  .view-all-btn:hover svg {
+    transform: translateX(3px);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Enhanced Animations -->
+<section class="h-screen relative flex items-center justify-center overflow-hidden">
+  <!-- Parallax Background -->
+  <div class="hero-image absolute inset-0 w-full h-full">
+    <img src="{% static 'images/pexels-amelie-buttner-243124733-12321803.jpg' %}"
+      class="absolute inset-0 w-full h-full object-cover" alt="Temple Background">
+    <div class="hero-gradient absolute inset-0"></div>
+  </div>
+
+  <!-- Hero Content -->
+  <div class="hero-content relative z-10 text-center px-6 max-w-4xl">
+    <h1 class="hero-title text-5xl md:text-6xl font-bold text-white mb-6">
+    </h1>
+
+    <p class="hero-subtitle text-xl md:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto">
+      Experience spiritual enlightenment through sacred rituals and divine blessings
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      <a href="{% url 'pooja:pooja_services' %}"
+        class="glow px-8 py-4 bg-orange-500 text-white rounded-full font-semibold text-lg hover:bg-orange-600 transform hover:scale-105 transition-all duration-300">
+        Book Pooja Now
+      </a>
+      <a href="{% url 'pooja:services' %}"
+        class="px-8 py-4 border-2 border-white text-white rounded-full font-semibold text-lg hover:bg-white hover:text-orange-600 transition-all duration-300">
+        Explore Services
+      </a>
+    </div>
+
+    <!-- Floating Icon -->
+    <div class="float mt-12">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-white animate-bounce" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- Pooja Section with Scroll Animations -->
+<section id="pooja1-section" class="pooja1-section">
+  <div class="pooja1-container">
+    <h2 class="pooja1-title fade-up text-gradient">Book Sacred Poojas Online</h2>
+
+    <p class="pooja1-subtitle fade-up">
+      Perform temple poojas with devotion and ease.
+      Choose your pooja, date, and offerings seamlessly.
+    </p>
+
+    <div class="pooja1-cards">
+      <div class="pooja1-card pooja-card-hover fade-up scale-in bg-white/10 backdrop-blur-sm">
+        <div class="text-5xl mb-4">🌸</div>
+        <h3 class="text-2xl font-bold text-orange-800 mb-3">Ganapathy Homam</h3>
+        <p class="text-orange-800">For obstacle removal and success in all endeavors</p>
+      </div>
+
+      <div class="pooja1-card pooja-card-hover fade-up scale-in bg-white/10 backdrop-blur-sm"
+        style="transition-delay: 0.1s;">
+        <div class="text-5xl mb-4">🔆</div>
+        <h3 class="text-2xl font-bold text-orange-800 mb-3">Ayush Homam</h3>
+        <p class="text-orange-800">For health, longevity and prosperity</p>
+      </div>
+
+      <div class="pooja1-card pooja-card-hover fade-up scale-in bg-white/10 backdrop-blur-sm"
+        style="transition-delay: 0.2s;">
+        <div class="text-5xl mb-4">🪷</div>
+        <h3 class="text-2xl font-bold text-orange-800 mb-3">Archana</h3>
+        <p class="text-orange-800">Personalized prayers in your name</p>
+      </div>
+    </div>
+
+    <a href="{% url 'pooja:pooja_services' %}"
+      class="modern-btn fade-up inline-flex items-center justify-center px-6 py-1 border border-transparent text-base font-medium rounded-md text-white  hover:bg-orange-900 md:py-4 md:text-lg md:px-10 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 shadow-lg hover:shadow-xl">
+      Book Pooja
+    </a>
+  </div>
+</section>
+
+<!-- Stack Photo Gallery Section -->
+<section id="stack-gallery"
+  class="relative min-h-screen bg-gradient-to-b from-gray-900 via-orange-950 to-gray-900 py-32 overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4">
+    <!-- Section Title -->
+    <div class="text-center mb-20">
+      <h2 class="text-5xl md:text-6xl font-bold text-white mb-4 gallery-section-title">
+        <span class="gallery-letter inline-block opacity-0">S</span>
+        <span class="gallery-letter inline-block opacity-0">a</span>
+        <span class="gallery-letter inline-block opacity-0">c</span>
+        <span class="gallery-letter inline-block opacity-0">r</span>
+        <span class="gallery-letter inline-block opacity-0">e</span>
+        <span class="gallery-letter inline-block opacity-0">d</span>
+        <span class="gallery-letter inline-block opacity-0 mx-3"> </span>
+        <span class="gallery-letter inline-block opacity-0">M</span>
+        <span class="gallery-letter inline-block opacity-0">o</span>
+        <span class="gallery-letter inline-block opacity-0">m</span>
+        <span class="gallery-letter inline-block opacity-0">e</span>
+        <span class="gallery-letter inline-block opacity-0">n</span>
+        <span class="gallery-letter inline-block opacity-0">t</span>
+        <span class="gallery-letter inline-block opacity-0">s</span>
+      </h2>
+      <p class="text-xl text-gray-300 fade-up">Glimpses of divine celebrations</p>
+    </div>
+
+    <!-- Stacked Cards Container -->
+    <div class="stack-container relative h-[600px] flex items-center justify-center">
+      {% for img in images %}
+      <div
+        class="stack-card absolute w-[80%] md:w-[600px] h-[400px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-700"
+        data-index="{{ forloop.counter0 }}" style="z-index: {{ images|length|add:'-'|add:forloop.counter0 }};">
+        <img src="{{ img.image_url }}?w=600&q=80&auto=format" srcset="
+            {{ img.image_url }}?w=300&q=80&auto=format 300w,
+            {{ img.image_url }}?w=600&q=80&auto=format 600w,
+            {{ img.image_url }}?w=900&q=80&auto=format 900w
+          " sizes="(max-width: 640px) 90vw, (max-width: 1024px) 80vw, 600px"
+          alt="{{ img.title|default:'Temple celebration' }}" class="w-full h-full object-cover" loading="lazy"
+          width="600" height="400" decoding="async" {% if forloop.counter0 < 3 %}fetchpriority="high" {% else
+          %}fetchpriority="auto" {% endif %}>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+        {% if img.title %}
+        <div class="absolute bottom-0 left-0 right-0 p-6">
+          <h3 class="text-white text-2xl font-bold">{{ img.title }}</h3>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <!-- View All Images Button -->
+  <div class="text-center">
+    <a href="{% url 'gallery' %}"
+      class="view-all-btn fade-up inline-flex items-center justify-center px-6 py-1 border border-transparent text-base font-medium rounded-md text-white  hover:bg-orange-900 md:py-4 md:text-lg md:px-10 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 shadow-lg hover:shadow-xl">
+      <span>View All Images</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+      </svg>
+    </a>
+  </div>
+
+</section>
+
+<!-- Temple History Section -->
+<section id="temple-history"
+  class="relative min-h-screen bg-gradient-to-b from-gray-900 via-black to-orange-950 py-32 overflow-hidden">
+  <!-- Decorative Elements -->
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute top-20 left-10 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-20 right-10 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl animate-pulse"
+      style="animation-delay: 1s;"></div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 relative z-10">
+    <!-- Section Title with Letter Animation -->
+    <div class="text-center mb-20">
+      <h2 class="text-5xl md:text-7xl font-bold mb-6 history-title">
+        <span class="history-letter inline-block opacity-0 text-orange-400">O</span>
+        <span class="history-letter inline-block opacity-0 text-orange-400">u</span>
+        <span class="history-letter inline-block opacity-0 text-orange-400">r</span>
+        <span class="history-letter inline-block opacity-0 mx-3"> </span>
+        <span class="history-letter inline-block opacity-0 text-white">H</span>
+        <span class="history-letter inline-block opacity-0 text-white">e</span>
+        <span class="history-letter inline-block opacity-0 text-white">r</span>
+        <span class="history-letter inline-block opacity-0 text-white">i</span>
+        <span class="history-letter inline-block opacity-0 text-white">t</span>
+        <span class="history-letter inline-block opacity-0 text-white">a</span>
+        <span class="history-letter inline-block opacity-0 text-white">g</span>
+        <span class="history-letter inline-block opacity-0 text-white">e</span>
+      </h2>
+      <div class="w-32 h-1 bg-gradient-to-r from-orange-500 to-yellow-500 mx-auto history-line opacity-0"></div>
+    </div>
+
+    <!-- History Content Cards -->
+    <div class="grid md:grid-cols-2 gap-8 mb-16">
+      <!-- Card 1 -->
+      <div
+        class="history-card relative bg-gradient-to-br from-orange-900/30 to-gray-900/50 backdrop-blur-sm rounded-3xl p-8 border border-orange-500/20 opacity-0">
+        <div class="absolute -top-6 -left-6 w-24 h-24 bg-orange-500/20 rounded-full blur-2xl"></div>
+        <div class="relative z-10">
+          <div class="w-16 h-16 bg-orange-500/20 rounded-2xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-400" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <h3 class="text-3xl font-bold text-white mb-4">Ancient Origins</h3>
+          <p class="text-gray-300 leading-relaxed">
+            Kandakalankavu Temple stands as a testament to centuries of devotion and architectural brilliance.
+            Built in the traditional Kerala style, the temple has been a beacon of spiritual light for generations.
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div
+        class="history-card relative bg-gradient-to-br from-yellow-900/30 to-gray-900/50 backdrop-blur-sm rounded-3xl p-8 border border-yellow-500/20 opacity-0">
+        <div class="absolute -top-6 -right-6 w-24 h-24 bg-yellow-500/20 rounded-full blur-2xl"></div>
+        <div class="relative z-10">
+          <div class="w-16 h-16 bg-yellow-500/20 rounded-2xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-400" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+          </div>
+          <h3 class="text-3xl font-bold text-white mb-4">Sacred Traditions</h3>
+          <p class="text-gray-300 leading-relaxed">
+            The temple follows ancient Vedic rituals and customs passed down through generations.
+            Each ceremony is performed with utmost devotion, preserving the sanctity of our traditions.
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div
+        class="history-card relative bg-gradient-to-br from-red-900/30 to-gray-900/50 backdrop-blur-sm rounded-3xl p-8 border border-red-500/20 opacity-0">
+        <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-red-500/20 rounded-full blur-2xl"></div>
+        <div class="relative z-10">
+          <div class="w-16 h-16 bg-red-500/20 rounded-2xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-400" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <h3 class="text-3xl font-bold text-white mb-4">Community Hub</h3>
+          <p class="text-gray-300 leading-relaxed">
+            More than a place of worship, Kandakalankavu Temple serves as a vibrant community center,
+            bringing people together through festivals, cultural events, and spiritual gatherings.
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div
+        class="history-card relative bg-gradient-to-br from-green-900/30 to-gray-900/50 backdrop-blur-sm rounded-3xl p-8 border border-green-500/20 opacity-0">
+        <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-green-500/20 rounded-full blur-2xl"></div>
+        <div class="relative z-10">
+          <div class="w-16 h-16 bg-green-500/20 rounded-2xl flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 class="text-3xl font-bold text-white mb-4">Divine Blessings</h3>
+          <p class="text-gray-300 leading-relaxed">
+            Devotees from far and wide visit to seek blessings and experience the divine energy
+            that permeates every corner of this sacred space, finding peace and spiritual fulfillment.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="relative timeline-container opacity-0">
+      <div
+        class="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-orange-500 via-yellow-500 to-red-500">
+      </div>
+
+      <div class="space-y-16">
+        <div class="timeline-item flex items-center justify-end pr-8 md:pr-16">
+          <div class="bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 border border-orange-500/30 max-w-md">
+            <div class="text-orange-400 font-bold text-xl mb-2">Ancient Era</div>
+            <p class="text-gray-300">The foundation of spiritual excellence was laid by devoted ancestors</p>
+          </div>
+          <div
+            class="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-orange-500 rounded-full border-4 border-gray-900">
+          </div>
+        </div>
+
+        <div class="timeline-item flex items-center justify-start pl-8 md:pl-16">
+          <div class="bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/30 max-w-md">
+            <div class="text-yellow-400 font-bold text-xl mb-2">Medieval Period</div>
+            <p class="text-gray-300">Expansion and renovation brought new glory to the temple architecture</p>
+          </div>
+          <div
+            class="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-yellow-500 rounded-full border-4 border-gray-900">
+          </div>
+        </div>
+
+        <div class="timeline-item flex items-center justify-end pr-8 md:pr-16">
+          <div class="bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 border border-red-500/30 max-w-md">
+            <div class="text-red-400 font-bold text-xl mb-2">Modern Era</div>
+            <p class="text-gray-300">Embracing technology while preserving ancient traditions for future generations</p>
+          </div>
+          <div
+            class="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-red-500 rounded-full border-4 border-gray-900">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Scroll to Top Button -->
+  <button id="scrollToTopBtn" class="fixed bottom-8 right-8 w-12 h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg transform transition-all duration-300 opacity-0 scale-90 flex items-center justify-center z-50">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+    </svg>
+  </button>
+</section>
+
+{% endblock %}
