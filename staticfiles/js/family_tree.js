@@ -394,10 +394,49 @@ async function loadTableAndDropdowns() {
 }
 
 async function deleteMember(id) {
-    if (!confirm('Are you sure?')) return;
-    await fetchAPI(`/api/members/${id}/`, 'DELETE');
-    loadTableAndDropdowns();
-    loadTree();
+    // Show confirmation toast
+    const confirmed = await new Promise((resolve) => {
+        const toast = document.createElement('div');
+        toast.className = 'fixed right-4 top-4 px-6 py-3 rounded-lg bg-yellow-600 text-white font-medium shadow-lg z-50 flex flex-col items-end';
+        toast.innerHTML = `
+            <p class="mb-3">Are you sure you want to delete this member?</p>
+            <div class="flex gap-2">
+                <button class="px-3 py-1 bg-red-600 rounded hover:bg-red-700" id="confirm-delete">Delete</button>
+                <button class="px-3 py-1 bg-gray-500 rounded hover:bg-gray-600" id="cancel-delete">Cancel</button>
+            </div>
+        `;
+        document.body.appendChild(toast);
+
+        // Remove toast after 10 seconds if no action is taken
+        const timeout = setTimeout(() => {
+            document.body.removeChild(toast);
+            resolve(false);
+        }, 10000);
+
+        // Handle button clicks
+        document.getElementById('confirm-delete').onclick = () => {
+            clearTimeout(timeout);
+            document.body.removeChild(toast);
+            resolve(true);
+        };
+        document.getElementById('cancel-delete').onclick = () => {
+            clearTimeout(timeout);
+            document.body.removeChild(toast);
+            resolve(false);
+        };
+    });
+
+    if (!confirmed) return;
+    
+    try {
+        await fetchAPI(`/api/members/${id}/`, 'DELETE');
+        window.showToast('Member deleted successfully', 'success');
+        loadTableAndDropdowns();
+        loadTree();
+    } catch (error) {
+        window.showToast('Failed to delete member', 'error');
+        console.error('Error deleting member:', error);
+    }
 }
 
 /* ================================
@@ -457,10 +496,12 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
 
     if (res.ok) {
         closeModal();
+        window.showToast(`Member ${id ? 'updated' : 'added'} successfully`, 'success');
         loadTableAndDropdowns();
         loadTree();
     } else {
         const err = await res.json();
-        alert(JSON.stringify(err));
+        window.showToast(`Error: ${JSON.stringify(err)}`, 'error');
+        console.error('Form submission error:', err);
     }
 });

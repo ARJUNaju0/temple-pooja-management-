@@ -21,6 +21,12 @@ def get_env_variable(name):
         raise ImproperlyConfigured(f"Missing environment variable: {name}")
     return value
 
+# Environment variables 1
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
+
+DEBUG = os.getenv("DEBUG", "True") == "True"
+
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,14 +35,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-wy&p6(0&ioj7*z6$ik^0#3#a69tesrcul5#k=bhnq-15a4z$if'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
 
 # Razorpay Configuration
 RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID')
@@ -57,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
     
     'temple_admin',  
     'main',
@@ -158,6 +157,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django_browser_reload.middleware.BrowserReloadMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'tprmsystem.urls'
@@ -180,12 +180,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tprmsystem.wsgi.application'
 
-# Database
+# Database 2
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
 }
 
 # Password validation
@@ -211,13 +217,20 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files
-import os
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3'
+    )
+}
+
+
 
 # Logging Configuration
 LOGGING = {
@@ -370,49 +383,5 @@ logs_dir = BASE_DIR / 'logs'
 if not logs_dir.exists():
     os.makedirs(logs_dir)
 
-# Logging Configuration
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',  # Set to DEBUG to see all messages
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': logs_dir / 'debug.log',
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'main': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'booking': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
+
     
