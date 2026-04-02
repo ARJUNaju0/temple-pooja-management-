@@ -293,10 +293,11 @@ os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": "dwfm7p4kf",
-    "API_KEY": "424969935353117",
-    "API_SECRET": "KsgTUY9kAYT79EGazvOstzMiYek",
+    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
 }
 
 cloudinary.config(
