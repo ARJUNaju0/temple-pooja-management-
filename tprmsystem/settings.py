@@ -69,7 +69,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     "crispy_forms",
     "crispy_bootstrap5",
-    'django_browser_reload',
      "cloudinary",
     "cloudinary_storage",
     'django_celery_beat',
@@ -156,7 +155,6 @@ MIDDLEWARE = [
     'main.middleware.JWTAuthenticationMiddleware',  
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
